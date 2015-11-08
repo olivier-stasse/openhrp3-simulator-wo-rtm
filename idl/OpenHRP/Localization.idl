@@ -1,0 +1,29 @@
+#ifndef OPENHRP_LOCALIZATION_IDL_INCLUDED
+#define OPENHRP_LOCALIZATION_IDL_INCLUDED
+
+/** @file idl/OpenHRP/Localization.idl
+ */
+
+#include "OpenHRPCommon.idl"
+
+/* Provide localization for one object */
+module OpenHRP {
+
+  /**
+   */
+  interface Localization 
+  {
+    /**
+     * Return localization for one object.
+     * @param   collisionPair       Collision Pair
+     * @endif
+    */
+    void getLocalizationForLink(in string aLinkName,
+				out LinkPosition aLinkPosition);
+  
+  };
+
+
+};
+
+#endif
