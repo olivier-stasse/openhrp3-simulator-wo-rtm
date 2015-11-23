@@ -91,7 +91,7 @@ endif()
 
 hrplib_install_macro(${target} ${HRPMODEL_VERSION})
 
-install(FILES ${headers} DESTINATION ${RELATIVE_HEADERS_INSTALL_PATH}/hrpModel)
+install(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hrpModel)
 
 # Body Customizers
 set(OPENHRP_3_0_CUSTOMIZERS ${OPENHRP_3_0_CUSTOMIZERS} CACHE FILEPATH "Source files of the body customizer for OpenHRP 3.0")

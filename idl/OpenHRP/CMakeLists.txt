@@ -6,4 +6,4 @@ foreach(name ${IDL_FILE_BASENAMES})
   list(APPEND idl_files ${name}.idl)
 endforeach()
 
-install(FILES ${idl_files} DESTINATION ${RELATIVE_IDL_INSTALL_PATH}/OpenHRP)
+install(FILES ${idl_files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/idl/OpenHRP)

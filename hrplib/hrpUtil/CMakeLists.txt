@@ -74,7 +74,7 @@ target_link_libraries(${target}
 
 hrplib_install_macro(${target} ${HRPUTIL_VERSION})
 
-install(FILES ${headers} DESTINATION ${RELATIVE_HEADERS_INSTALL_PATH}/hrpUtil)
+install(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hrpUtil)
 
 if(BUILD_GOOGLE_TEST)
   add_executable(testEigen3d testEigen3d.cpp Eigen3d.cpp)

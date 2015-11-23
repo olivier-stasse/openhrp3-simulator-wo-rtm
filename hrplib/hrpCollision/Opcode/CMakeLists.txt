@@ -19,6 +19,6 @@ set(headers
   OPC_PlanesCollider.h
   )
 
-install(FILES ${headers} DESTINATION ${RELATIVE_HEADERS_INSTALL_PATH}/hrpCollision/Opcode)
+install(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hrpCollision/Opcode)
 
 ADD_SUBDIRECTORY(Ice)

@@ -63,7 +63,7 @@ install(TARGETS ${target}
 
 set(given_headers ORBwrap.h)
 
-install(FILES ${given_headers} ${idl_h_files} DESTINATION ${RELATIVE_HEADERS_INSTALL_PATH}/hrpCorba)
+install(FILES ${given_headers} ${idl_h_files} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hrpCorba)
 execute_process(
   COMMAND python -c "import sys; print '%s.%s'%(sys.version_info[0:2])"
   OUTPUT_VARIABLE python_version

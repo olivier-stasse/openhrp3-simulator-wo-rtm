@@ -78,6 +78,6 @@ endif()
 
 hrplib_install_macro(${target} ${HRPCOLLISION_VERSION})
 
-install(FILES ${headers} DESTINATION ${RELATIVE_HEADERS_INSTALL_PATH}/hrpCollision)
+install(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hrpCollision)
 
 ADD_SUBDIRECTORY(Opcode)

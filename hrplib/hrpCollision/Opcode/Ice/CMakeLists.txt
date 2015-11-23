@@ -21,4 +21,4 @@ set(headers
   IceOBB.h
   )
 
-install(FILES ${headers} DESTINATION ${RELATIVE_HEADERS_INSTALL_PATH}/hrpCollision/Opcode/Ice)
+install(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/hrpCollision/Opcode/Ice)
