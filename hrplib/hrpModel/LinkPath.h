@@ -47,6 +47,6 @@ namespace hrp {
         void findPathFromRootSub(Link* link);
     };
 
-};
+}
 
 #endif

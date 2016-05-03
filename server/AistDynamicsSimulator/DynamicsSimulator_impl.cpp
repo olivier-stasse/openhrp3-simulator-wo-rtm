@@ -77,7 +77,7 @@ namespace {
         IdToLabelMap::iterator p = commandLabelMap.find(type);
         return (p != commandLabelMap.end()) ? p->second : "Requesting Unknown Data Type";
     }
-};
+}
 
 
 template<typename X, typename X_ptr>
@@ -346,7 +346,6 @@ void DynamicsSimulator_impl::registerIntersectionCheckPair
     const double tolerance
     )
 {
-    const double epsilon = 0.0;
 
     if(debugMode){
         cout << "DynamicsSimulator_impl::registerIntersectionCheckPair("
@@ -453,7 +452,7 @@ void DynamicsSimulator_impl::getExtraJointConstraintForce
 (
     const char * characterName,
     const char * extraJointName,
-    DblSequence6_out contactForce
+    DblSequence6_out 
     )
 {
     if(debugMode){

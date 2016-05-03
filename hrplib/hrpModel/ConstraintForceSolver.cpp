@@ -135,8 +135,8 @@ namespace hrp
 #define PI M_PI
 #define PI_2 M_PI/2
 #else
-        static const double PI   = 3.14159265358979323846;
-        static const double PI_2 = 1.57079632679489661923;
+        static constexpr double PI   = 3.14159265358979323846;
+        static constexpr double PI_2 = 1.57079632679489661923;
 #endif
 
         WorldBase& world;
@@ -229,7 +229,7 @@ namespace hrp
             Vector3 jointConstraintAxes[3];
         };
         typedef intrusive_ptr<ExtraJointLinkPair> ExtraJointLinkPairPtr;
-        vector<ExtraJointLinkPairPtr> extraJointLinkPairs;;
+        vector<ExtraJointLinkPairPtr> extraJointLinkPairs;
 
         std::vector<LinkPair*> constrainedLinkPairs;
 
@@ -260,7 +260,7 @@ namespace hrp
         dvector solution;
 
         // random number generator
-        variate_generator<mt19937, uniform_real<> > randomAngle;
+      variate_generator<boost::mt19937&, uniform_real<> > randomAngle;
 
         // for special version of gauss sidel iterative solver
         std::vector<int> frictionIndexToContactIndex;
@@ -372,13 +372,13 @@ namespace hrp
     const double CFSImpl::PI   = 3.14159265358979323846;
     const double CFSImpl::PI_2 = 1.57079632679489661923;
 #endif
-};
+}
 
-
+boost::mt19937 gen;
 
 CFSImpl::CFSImpl(WorldBase& world) :
     world(world),
-    randomAngle(mt19937(), uniform_real<>(0.0, 2.0 * PI))
+    randomAngle(gen, uniform_real<>(0.0, 2.0 * PI))
 {
     maxNumGaussSeidelIteration = DEFAULT_MAX_NUM_GAUSS_SEIDEL_ITERATION;
     numGaussSeidelInitialIteration = DEFAULT_NUM_GAUSS_SEIDEL_INITIAL_ITERATION;

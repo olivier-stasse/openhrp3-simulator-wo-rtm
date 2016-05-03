@@ -36,13 +36,13 @@ namespace hrp {
     */
     inline dmatrix inverse(const dmatrix& M)
     {
-        const int dim = M.rows();
+      const int dim = (int)M.rows();
         dmatrix E = dmatrix::Identity(dim,dim);
         dmatrix Minv(dim, dim);
         solveLinearEquationLU(M, E, Minv);
         return Minv;
     }
 
-};
+}
 
 #endif

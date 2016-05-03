@@ -38,6 +38,6 @@ namespace hrp {
             delete obj;
         }
     }
-};
+}
 
 #endif

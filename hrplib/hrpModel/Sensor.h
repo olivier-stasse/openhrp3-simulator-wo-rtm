@@ -147,7 +147,7 @@ namespace hrp {
         double nextUpdateTime;
         bool isUpdated, isEnabled;
     };
-};
+}
 
 
 #endif

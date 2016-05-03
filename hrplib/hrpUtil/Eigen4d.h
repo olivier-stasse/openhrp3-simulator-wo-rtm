@@ -22,6 +22,6 @@ namespace hrp
 
     HRP_UTIL_EXPORT void calcRodrigues(Matrix44& out_R, const Vector3& axis, double q);
     HRP_UTIL_EXPORT void calcTransformMatrix(VrmlTransform* transform, Matrix44& out_T);
-};
+}
 
 #endif

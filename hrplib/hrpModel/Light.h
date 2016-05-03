@@ -41,6 +41,6 @@ namespace hrp {
         // attributes for spot light
         double beamWidth, cutOffAngle; 
     };
-};
+}
 
 #endif

@@ -85,7 +85,7 @@ namespace hrp {
            obtained by joint() function.
         */
         inline int numJoints() const {
-            return jointIdToLinkArray.size();
+	  return (int)jointIdToLinkArray.size();
         }
 
         /**
@@ -160,11 +160,11 @@ namespace hrp {
         }
 
         inline int numSensors(int sensorType) const {
-            return allSensors[sensorType].size();
+	  return (int)allSensors[sensorType].size();
         }
 
         inline int numSensorTypes() const {
-            return allSensors.size();
+	  return (int)allSensors.size();
         }
 
         void clearSensorValues();
@@ -305,7 +305,7 @@ namespace hrp {
 
     typedef boost::shared_ptr<Body> BodyPtr;
 
-};
+}
 
 
 HRPMODEL_API std::ostream &operator<< (std::ostream& out, hrp::Body& body);

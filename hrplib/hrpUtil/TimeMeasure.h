@@ -35,9 +35,9 @@ public:
     }
 
     void end(){
-	double beginTime = tv.tv_sec + (double)tv.tv_usec * 1.0e-6;
+      double beginTime = tv.tv_sec + ((double)tv.tv_usec) * 1.0e-6;
 	gettimeofday(&tv, 0);
-	double endTime = tv.tv_sec + (double)tv.tv_usec * 1.0e-6;
+	double endTime = tv.tv_sec + ((double)tv.tv_usec) * 1.0e-6;
 	time_ = endTime - beginTime;
         if (time_ > maxTime_) maxTime_ = time_; 
 	totalTime_ += time_;

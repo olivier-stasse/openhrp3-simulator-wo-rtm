@@ -40,7 +40,7 @@ namespace hrp {
         }
 		
         inline int numJoints() const {
-            return joints.size();
+	  return (int)joints.size();
         }
 		
         inline Link* joint(int index) const {
@@ -99,7 +99,7 @@ namespace hrp {
 
     typedef boost::shared_ptr<JointPath> JointPathPtr;
 	
-};
+}
 
 
 #endif

@@ -913,6 +913,6 @@ namespace hrp {
         }
     }
 
-};
+}
 
 #endif

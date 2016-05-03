@@ -84,7 +84,7 @@ void JointPath::extractJoints()
 {
     numUpwardJointConnections = 0;
 
-    int n = linkPath.size();
+    int n = (int)linkPath.size();
     if(n <= 1){
         joints.clear();
     } else {
@@ -127,7 +127,7 @@ void JointPath::onJointPathUpdated()
 
 void JointPath::calcJacobian(dmatrix& out_J) const
 {
-    const int n = joints.size();
+  const int n = (int)joints.size();
     out_J.resize(6, n);
 	
     if(n > 0){

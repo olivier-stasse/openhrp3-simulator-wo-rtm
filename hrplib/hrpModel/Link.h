@@ -199,7 +199,7 @@ namespace hrp {
         void putInformation(std::ostream& out); // for the iostream output
     };
 
-};
+}
 	
 
 #endif

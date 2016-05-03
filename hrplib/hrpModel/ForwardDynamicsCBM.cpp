@@ -87,8 +87,8 @@ void ForwardDynamicsMM::initialize()
 		}
 	}
 
-	int n = unknown_rootDof + torqueModeJoints.size();
-	int m = highGainModeJoints.size();
+	int n = unknown_rootDof + (int)torqueModeJoints.size();
+	int m = (int)highGainModeJoints.size();
     
 	isNoUnknownAccelMode = (n == 0);
 
@@ -205,7 +205,7 @@ void ForwardDynamicsMM::calcMotionWithEulerMethod()
 		root->w  += root->dw  * timeStep;
     }
 
-	int n = torqueModeJoints.size();
+    int n = (int)torqueModeJoints.size();
 	for(int i=0; i < n; ++i){
 		Link* link = torqueModeJoints[i];
 		link->q  += link->dq  * timeStep;
@@ -219,7 +219,7 @@ void ForwardDynamicsMM::calcMotionWithEulerMethod()
 
 void ForwardDynamicsMM::calcMotionWithRungeKuttaMethod()
 {
-	int numHighGainJoints = highGainModeJoints.size();
+  int numHighGainJoints = (int)highGainModeJoints.size();
     Link* root = body->rootLink();
 
     if(given_rootDof){
@@ -498,7 +498,7 @@ void ForwardDynamicsMM::calcMassMatrix()
 	for(size_t i=0; i < torqueModeJoints.size(); ++i){
 		Link* link = torqueModeJoints[i];
 		link->ddq = 1.0;
-		int j = i + unknown_rootDof;
+		int j = (int) i + unknown_rootDof;
 		setColumnOfMassMatrix(M11, j);
 		M11(j, j) += link->Jm2; // motor inertia
 		link->ddq = 0.0;
@@ -506,16 +506,16 @@ void ForwardDynamicsMM::calcMassMatrix()
     for(size_t i=0; i < highGainModeJoints.size(); ++i){
 		Link* link = highGainModeJoints[i];
 		link->ddq = 1.0;
-        int j = i + given_rootDof;
+		int j = (int) i + given_rootDof;
 		setColumnOfMassMatrix(M12, j);
 		link->ddq = 0.0;
     }
 
 	// subtract the constant term
-	for(size_t i=0; i < M11.cols(); ++i){
+    for(size_t i=0; i < (size_t)M11.cols(); ++i){
             M11.col(i) -= b1;
 	}
-	for(size_t i=0; i < M12.cols(); ++i){
+    for(size_t i=0; i < (size_t) M12.cols(); ++i){
             M12.col(i) -= b1;
 	}
 

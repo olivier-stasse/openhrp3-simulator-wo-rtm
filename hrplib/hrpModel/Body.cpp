@@ -96,8 +96,8 @@ Body::Body()
 
 
 Body::Body(const Body& org)
-    : modelName_(org.modelName_),
-      name_(org.name_),
+    : name_(org.name_),
+      modelName_(org.modelName_),
       allSensors(Sensor::NUM_SENSOR_TYPES)
 {
     initialize();
@@ -226,7 +226,7 @@ void Body::updateLinkTree()
 
         int id = link->jointId;
         if(id >= 0){
-            int size = jointIdToLinkArray.size();
+	  int size = (int)jointIdToLinkArray.size();
             if(id >= size){
                 jointIdToLinkArray.resize(id + 1, 0);
             }
@@ -241,7 +241,7 @@ void Body::updateLinkTree()
 
     for(size_t i=0; i < jointIdToLinkArray.size(); ++i){
         if(!jointIdToLinkArray[i]){
-            jointIdToLinkArray[i] = createEmptyJoint(i);
+	  jointIdToLinkArray[i] = createEmptyJoint((int)i);
             std::cerr << "Warning: Model " << modelName_ <<
                 " has empty joint ID in the valid IDs." << std::endl;
         }
@@ -398,7 +398,7 @@ void Body::calcMassMatrix(dmatrix& out_M)
     }
 
     // subtract the constant term
-    for(size_t i = 0; i < out_M.cols(); ++i){
+    for(size_t i = 0; i < (size_t)out_M.cols(); ++i){
         out_M.col(i) -= b1;
     }
 
@@ -544,7 +544,7 @@ Sensor* Body::createSensor(Link* link, int sensorType, int id, const std::string
     if(sensorType < Sensor::NUM_SENSOR_TYPES && id >= 0){
 
         SensorArray& sensors = allSensors[sensorType];
-        int n = sensors.size();
+        int n = (int)sensors.size();
         if(id >= n){
             sensors.resize(id + 1, 0);
         }
@@ -573,7 +573,7 @@ Sensor* Body::createSensor(Link* link, int sensorType, int id, const std::string
 void Body::addSensor(Sensor* sensor, int sensorType, int id ){
     if(sensorType < Sensor::NUM_SENSOR_TYPES && id >= 0){
         SensorArray& sensors = allSensors[sensorType];
-        int n = sensors.size();
+        int n = (int)sensors.size();
         if(id >= n){
             sensors.resize(id + 1, 0);
         }

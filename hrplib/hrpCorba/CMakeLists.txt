@@ -1,8 +1,7 @@
 
 # @author Shin'ichiro Nakaoka
-
 include(${OPENHRP_SIMULATOR_IDL_DIR}/OpenHRP/IDL_FILE_BASENAMES.cmake)
-
+ 
 set(idl_flags_cpp ${VERBOSE_FLAG} -bcxx -Wbuse_quotes -Wbh=.hh -Wbs=Sk.cpp -I${OPENRTM_IDL_DIR})
 set(idl_flags_py  ${VERBOSE_FLAG} -bpython -I${OPENRTM_IDL_DIR})
 
@@ -37,7 +36,9 @@ endforeach()
 
 set(target hrpCorbaStubSkel-${OPENHRP_LIBRARY_VERSION})
 
-add_library(${target} STATIC ${idl_cpp_files} ${idl_py_files})
+
+
+add_library(${target} SHARED ${idl_cpp_files} ${idl_py_files})
 
 if(UNIX)
   set_target_properties(${target} PROPERTIES COMPILE_FLAGS -fPIC)

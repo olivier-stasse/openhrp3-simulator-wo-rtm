@@ -1,15 +1,34 @@
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.6)
+
+include(cmake/base.cmake)
+include(cmake/pthread.cmake)
+
+set(PROJECT_NAME OpenHRP-Simulator)
+set(PROJECT_DESCRIPTION "OpenHRP simulator")
+set(PROJECT_URL "http://github.com/fkanehiro/openhrp3")
+
+# Disable -Werror on Unix for now.
+set(CXX_DISABLE_WERROR True)
+set(CMAKE_VERBOSE_MAKEFILE True)
+
+# Add std=c++11 flag
+if (UNIX)
+  SET(LFLAG -std=c++11)
+  SET(CMAKE_CXX_FLAGS "${LFLAG} ${CMAKE_CXX_FLAGS}")
+endif(UNIX)
+
+
+setup_project()
 
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-project(OpenHRP-Simulator)
-
 set(OPENHRP_SIMULATOR_VERSION_MAJOR 3)
 set(OPENHRP_SIMULATOR_VERSION_MINOR 1)
 set(OPENHRP_SIMULATOR_VERSION_MICRO 3)
 
+set(OPENHRP_LIBRARY_VERSION "${OPENHRP_SIMULATOR_VERSION_MAJOR}.${OPENHRP_SIMULATOR_VERSION_MINOR}.${OPENHRP_SIMULATOR_VERSION_MICRO}")
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 # Add local modules
@@ -69,6 +88,13 @@ if(UNIX)
   endif()
 endif()
 
+# OnlineViewer
+if(UNIX)
+  add_required_dependency("gepetto-viewer")
+  search_for_pthread()
+  include_directories(${GEPETTO_VIEWER_INCLUDE_DIR})
+endif()
+
 include_directories(${PROJECT_BINARY_DIR}/hrplib)
 include_directories(${PROJECT_SOURCE_DIR}/hrplib)
 
@@ -86,3 +112,6 @@ set(OPENHRP_SHARE_DIR ${OPENHRP_DIR}/${RELATIVE_SHARE_INSTALL_PATH})
 add_subdirectory(idl)
 add_subdirectory(hrplib)
 add_subdirectory(server)
+add_subdirectory(sample)
+
+setup_project_finalize()

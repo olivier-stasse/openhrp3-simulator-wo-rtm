@@ -149,6 +149,6 @@ namespace hrp
         v3(2) = m(row, col);
     }
     
-};
+}
 
 #endif

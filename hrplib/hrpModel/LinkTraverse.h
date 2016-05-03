@@ -38,7 +38,7 @@ namespace hrp {
         virtual void find(Link* root, bool doUpward = false, bool doDownward = true);
 
         inline int numLinks() const {
-            return links.size();
+	  return (int)links.size();
         }
 
         inline bool empty() const {
@@ -91,7 +91,7 @@ namespace hrp {
 
     };
 
-};
+}
 
 HRPMODEL_API std::ostream& operator<<(std::ostream& os, hrp::LinkTraverse& traverse);
 

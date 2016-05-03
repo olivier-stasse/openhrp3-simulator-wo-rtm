@@ -61,8 +61,8 @@ namespace hrp {
 
 				out_x = b;
 
-				const int n = a.rows();
-				const int nrhs = b.cols();
+				const int n = (int)a.rows();
+				const int nrhs = (int)b.cols();
 				int info;
 				std::vector<int> ipiv(n);
 
@@ -372,7 +372,7 @@ namespace hrp {
 				mlapack a = _a;	// <-
 
 				int info;
-				int n = a.cols();
+				int n = (int)a.cols();
 				int lda = n;
 				std::vector<int> ipiv(n);
 

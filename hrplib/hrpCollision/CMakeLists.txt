@@ -58,6 +58,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Opcode)
 
 set(target hrpCollision-${OPENHRP_LIBRARY_VERSION})
 
+message("Library to be compiled: ${target}")
+
 add_library(${target} SHARED ${sources})
 
 # interface version 0.0.0 - version 3.0.0 beta1

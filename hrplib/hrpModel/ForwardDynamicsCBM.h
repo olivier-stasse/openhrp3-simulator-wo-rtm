@@ -156,6 +156,6 @@ namespace hrp
 
 	typedef boost::shared_ptr<ForwardDynamicsMM> ForwardDynamicsMMPtr;
 	
-};
+}
 
 #endif

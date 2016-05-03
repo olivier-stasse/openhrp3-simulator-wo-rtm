@@ -50,7 +50,7 @@ namespace hrp
         void setAllowedPenetrationDepth(double dVal);
         double getAllowedPenetrationDepth() const;
 	};
-};
+}
 
 
 #endif

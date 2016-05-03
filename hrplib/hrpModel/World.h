@@ -41,7 +41,7 @@ namespace hrp {
            @brief get the number of bodies in this world
            @return the number of bodies
         */ 
-        int numBodies() { return bodyInfoArray.size(); }
+        int numBodies() { return (int)bodyInfoArray.size(); }
 
         /**
            @brief get body by index
@@ -220,6 +220,6 @@ namespace hrp {
 		}
 	};
 
-};
+}
 
 #endif
