@@ -7,6 +7,7 @@ void * osgOnlineViewer_thread(void *arg)
   MainWindow * a_main_win= static_cast<MainWindow*>(arg);
 
   a_main_win->spin();
+  return 0;
 }
 
 MainWindow::MainWindow(CORBA::ORB_ptr orb):
@@ -74,6 +75,7 @@ int MainWindow::Init()
   pthread_attr_init(&attr);
   pthread_create(&ptId, &attr, 
 		 osgOnlineViewer_thread,(void *)this);
+  return 1;
 }
 
 int MainWindow::spin()

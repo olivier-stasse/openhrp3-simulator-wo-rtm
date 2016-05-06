@@ -16,8 +16,34 @@
 
 using namespace graphics;
 
-typedef std::map<std::string,graphics::GroupNodePtr_t> MapOfOsgs;
-typedef std::map<std::string,graphics::GroupNodePtr_t>::iterator MapOfOsgs_it;
+class OLVLinkInfo
+{
+public:
+  std::vector<graphics::NodePtr_t> list_of_shapes;
+  graphics::GroupNodePtr_t grp_id;
+  graphics::GroupNodePtr_t grp_snd_id;
+
+  void set_shape_transform_matrix(OpenHRP::TransformedShapeIndex & a_trans_shape_id,
+				  unsigned int id_int_list_of_shapes,
+				  bool isZCylinder=false);  
+  void set_link_transform_matrix(OpenHRP::LinkInfo & aLinkInfo);
+  int m_Debug;
+
+  // Constructor
+  OLVLinkInfo();
+
+};
+
+typedef struct 
+{
+  graphics::GroupNodePtr_t grp_id;
+  /* Map from osgId to jointId */
+  std::vector<OLVLinkInfo> links;  
+
+} OLVBodyInfo;
+
+typedef std::map<std::string,OLVBodyInfo> MapOfBodys;
+typedef std::map<std::string,OLVBodyInfo>::iterator MapOfBodys_it;
 
 class FromBodyToOsg
 {
@@ -42,7 +68,39 @@ protected:
   CORBA::ORB_var orb_;
 
   /** Map of objects */
-  MapOfOsgs map_of_osgs_;
+  MapOfBodys map_of_bodys_;
+
+  /** Display body */
+  void display_body(OpenHRP::BodyInfo_var aBodyInfo);
+  
+  /** Display link */
+  void display_link(OpenHRP::LinkInfo & aLinkInfo);
+  
+  /** @name Analysis and insert shapes @{*/
+  
+  void insert_box(OpenHRP::ShapeInfo & aShapeInfo,
+		  const char *name,
+		  OLVLinkInfo & an_olv_link_info,
+		  OpenHRP::TransformedShapeIndex & a_trans_shape_id,
+		  unsigned int id_in_list_of_shapes);
+
+  void insert_cylinder(OpenHRP::ShapeInfo & aShapeInfo,
+		       const char *name,
+		       OLVLinkInfo & an_olv_link_info,
+		       OpenHRP::TransformedShapeIndex & a_trans_shape_id,
+		       unsigned int id_in_list_of_shapes);
+
+  void insert_mesh(OpenHRP::ShapeInfo & aShapeInfo,
+		   const char *name,
+		   OLVLinkInfo & an_olv_link_info,
+		   OpenHRP::TransformedShapeIndex & a_trans_shape_id,
+		   unsigned int id_in_list_of_shapes);
+
+  void analysis_shape_info_sequence(OpenHRP::BodyInfo_var & aBodyInfo,
+				    OLVBodyInfo & an_olv_body_info);
+  /* @} */
+
+  int m_Debug;
 };
 
 class FromBodyToOsgDataType : public osg::Referenced

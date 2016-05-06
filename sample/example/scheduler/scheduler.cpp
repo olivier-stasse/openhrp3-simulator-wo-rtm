@@ -119,8 +119,8 @@ int main(int argc, char* argv[])
 		}
 	try 
 		{
-			olv->load(floor->name(), Model[0].c_str());
 			olv->load(body->name(), Model[1].c_str());
+			//			olv->load(floor->name(), Model[0].c_str());
 			olv->clearLog();
 		} 
 	catch (CORBA::SystemException& ex) 
@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 		// 	controller->input();
 
 		i++;
-		if (i%100==0)
+		//if (i%1000==0)
 			std::cout << " Counter: " << i << std::endl;
 
 		time = timeStep * i;
@@ -229,14 +229,18 @@ int main(int argc, char* argv[])
 
 		// if(control)
 		// 	controller->control();
-               
+      
+		std::cout << "Before simulation." << std::endl;
 		// ================== simulate one step ==============
-		dynamicsSimulator->stepSimulation();					    
+		dynamicsSimulator->stepSimulation();					
+		std::cout << "After simulation." << std::endl;
                
 		// ================== viewer update ====================
 		try {
+			std::cout << "Before olv." << std::endl;
 			dynamicsSimulator -> getWorldState( state );
 			olv->update( state );
+			std::cout << "After olv." << std::endl;
 		} catch (CORBA::SystemException& ex) {
 			return 1;
 		}
