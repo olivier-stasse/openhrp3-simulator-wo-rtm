@@ -14,33 +14,38 @@
 // Gepetto headers
 #include <gepetto/viewer/group-node.h>
 
+// OnLineViewer headers
+#include "olv-link-info.hh"
+#include "olv-material-info.hh"
+#include "olv-appearance-info.hh"
+
 using namespace graphics;
-
-class OLVLinkInfo
-{
-public:
-  std::vector<graphics::NodePtr_t> list_of_shapes;
-  graphics::GroupNodePtr_t grp_id;
-  graphics::GroupNodePtr_t grp_snd_id;
-
-  void set_shape_transform_matrix(OpenHRP::TransformedShapeIndex & a_trans_shape_id,
-				  unsigned int id_int_list_of_shapes,
-				  bool isZCylinder=false);  
-  void set_link_transform_matrix(OpenHRP::LinkInfo & aLinkInfo);
-  int m_Debug;
-
-  // Constructor
-  OLVLinkInfo();
-
-};
 
 typedef struct 
 {
   graphics::GroupNodePtr_t grp_id;
+
+  /* Map of materials. */
+  std::vector<OLVMaterialInfo> materials;
+
+  /* Map of appearances. */
+  std::vector<OLVAppearanceInfo> appearances;
+
   /* Map from osgId to jointId */
   std::vector<OLVLinkInfo> links;  
 
 } OLVBodyInfo;
+
+typedef struct
+{
+  OpenHRP::ShapeInfo * aShapeInfo;
+  const char *name;
+  OLVLinkInfo * an_olv_link_info;
+  OpenHRP::TransformedShapeIndex * a_trans_shape_id;
+  unsigned int id_in_list_of_shapes;
+  OpenHRP::BodyInfo_var aBodyInfo;
+  OLVBodyInfo * an_olv_body_info;
+} GeometricPrimitiveInsertParameters;
 
 typedef std::map<std::string,OLVBodyInfo> MapOfBodys;
 typedef std::map<std::string,OLVBodyInfo>::iterator MapOfBodys_it;
@@ -75,31 +80,40 @@ protected:
   
   /** Display link */
   void display_link(OpenHRP::LinkInfo & aLinkInfo);
+
+  /** Display material */
+  void display_material(OpenHRP::MaterialInfo & aMaterialInfo);
+
+  /** Display appareance */
+  void display_appearance(OpenHRP::AppearanceInfo & an_appearance);
   
   /** @name Analysis and insert shapes @{*/
   
-  void insert_box(OpenHRP::ShapeInfo & aShapeInfo,
-		  const char *name,
-		  OLVLinkInfo & an_olv_link_info,
-		  OpenHRP::TransformedShapeIndex & a_trans_shape_id,
-		  unsigned int id_in_list_of_shapes);
+  void insert_box(GeometricPrimitiveInsertParameters & aGPIP);
 
-  void insert_cylinder(OpenHRP::ShapeInfo & aShapeInfo,
-		       const char *name,
-		       OLVLinkInfo & an_olv_link_info,
-		       OpenHRP::TransformedShapeIndex & a_trans_shape_id,
-		       unsigned int id_in_list_of_shapes);
+  void insert_cylinder(GeometricPrimitiveInsertParameters & aGPIP);
 
-  void insert_mesh(OpenHRP::ShapeInfo & aShapeInfo,
-		   const char *name,
-		   OLVLinkInfo & an_olv_link_info,
-		   OpenHRP::TransformedShapeIndex & a_trans_shape_id,
-		   unsigned int id_in_list_of_shapes);
+  void insert_mesh(GeometricPrimitiveInsertParameters & aGPIP);
 
   void analysis_shape_info_sequence(OpenHRP::BodyInfo_var & aBodyInfo,
 				    OLVBodyInfo & an_olv_body_info);
   /* @} */
 
+  void extract_material_info(OpenHRP::BodyInfo_var & aBodyInfo,
+			     OLVBodyInfo & an_olv_body_info);
+
+  void extract_appearance_info(OpenHRP::BodyInfo_var & aBodyInfo,
+			       OLVBodyInfo & an_olv_body_info);
+
+  /** Appearance and material related methods */
+  OLVMaterialInfo & find_material(GeometricPrimitiveInsertParameters & aGPIP);
+  OLVAppearanceInfo & find_appearance(GeometricPrimitiveInsertParameters & aGPIP);
+  
+  /* NIL value for material info. */
+  OLVMaterialInfo null_olv_material_info_;
+  
+  /* NIL value for appearance info. */
+  OLVAppearanceInfo null_olv_appearance_info_;
   int m_Debug;
 };
 

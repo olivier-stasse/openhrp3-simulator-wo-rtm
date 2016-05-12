@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 	try 
 		{
 			olv->load(body->name(), Model[1].c_str());
-			//			olv->load(floor->name(), Model[0].c_str());
+			olv->load(floor->name(), Model[0].c_str());
 			olv->clearLog();
 		} 
 	catch (CORBA::SystemException& ex) 
@@ -167,15 +167,45 @@ int main(int argc, char* argv[])
 	}
 	dynamicsSimulator->setCharacterLinkData( body->name(), "WAIST", DynamicsSimulator::ABS_TRANSFORM, trans );
 	DblSequence angle;
-	angle.length(29);
-	angle[0] = 0.0;         angle[1] = -0.0360373;  angle[2] = 0.0;         angle[3] = 0.0785047;
-	angle[4] = -0.0424675;  angle[5] = 0.0;         angle[6] = 0.174533;    angle[7] = -0.00349066;
-	angle[8] = 0.0;         angle[9] = -1.5708;     angle[10] = 0.0;        angle[11] = 0.0;
-	angle[12] = 0.0;        angle[13] = 0.0;        angle[14] = -0.0360373; angle[15] = 0.0;
-	angle[16] = 0.0785047;  angle[17] = -0.0424675; angle[18] = 0.0;        angle[19] = 0.174533;
-	angle[20] = -0.00349066;angle[21] = 0.0;        angle[22] = -1.5708;    angle[23] = 0.0;
-	angle[24] = 0.0;        angle[25] = 0.0;        angle[26] = 0.0;        angle[27] = 0.0;
-	angle[28] = 0.0;
+	if (body->name()=="sample")
+		{
+			angle.length(29);
+			angle[0] = 0.0;         angle[1] = -0.0360373;  
+			angle[2] = 0.0;         angle[3] = 0.0785047;
+			angle[4] = -0.0424675;  angle[5] = 0.0;         
+			
+			angle[6] = 0.174533;    angle[7] = -0.00349066;
+			angle[8] = 0.0;         angle[9] = -1.5708;     
+			angle[10] = 0.0;        angle[11] = 0.0;
+			
+			angle[12] = 0.0;        angle[13] = 0.0;        
+			angle[14] = -0.0360373; angle[15] = 0.0;       
+			
+			angle[16] = 0.0785047;  angle[17] = -0.0424675; angle[18] = 0.0;        
+			angle[19] = 0.174533;	angle[20] = -0.00349066; angle[21] = 0.0; angle[22] = -1.5708;    
+			
+			angle[23] = 0.0;	angle[24] = 0.0;  angle[25] = 0.0;        
+			angle[26] = 0.0;  angle[27] = 0.0;  angle[28] = 0.0;
+		}
+	else 	if (body->name()=="HRP2")
+		{
+			angle[0] = 0.0    ; angle[1]  = 0.0     ; angle[2] = -0.45379;
+			angle[3] = 0.87266; angle[4]  =-0.41888 ; angle[5] = 0.0;
+
+			angle[6] = 0.0    ; angle[7]  = 0.0     ; angle[8] = -0.45379;
+			angle[9] = 0.87266; angle[10] =-0.41888 ; angle[11] = 0.0;
+
+			angle[12] = 0.0   ; angle[13] = 0.0;
+			angle[14] = 0.0   ; angle[15] = 0.0;
+
+			angle[16] = 0.2618; angle[17] =-0.17453 ; angle[18] = 0.0;
+			angle[19] =-0.5236; angle[20] = 0.0     ; angle[21] = 0.0; 
+			angle[22] = 0.17453;
+			
+			angle[23] = 0.2618; angle[24] = 0.17453 ; angle[25] = 0.0;
+			angle[26] =-0.5236; angle[27] = 0.0     ; angle[28] = 0.0;
+			angle[29] = 0.17453;
+		}
 	dynamicsSimulator->setCharacterAllLinkData( body->name(), DynamicsSimulator::JOINT_VALUE, angle );
 	dynamicsSimulator->calcWorldForwardKinematics();
 
@@ -221,7 +251,7 @@ int main(int argc, char* argv[])
 		// 	controller->input();
 
 		i++;
-		//if (i%1000==0)
+		if (i%1000==0)
 			std::cout << " Counter: " << i << std::endl;
 
 		time = timeStep * i;
@@ -230,17 +260,13 @@ int main(int argc, char* argv[])
 		// if(control)
 		// 	controller->control();
       
-		std::cout << "Before simulation." << std::endl;
 		// ================== simulate one step ==============
 		dynamicsSimulator->stepSimulation();					
-		std::cout << "After simulation." << std::endl;
                
 		// ================== viewer update ====================
 		try {
-			std::cout << "Before olv." << std::endl;
 			dynamicsSimulator -> getWorldState( state );
 			olv->update( state );
-			std::cout << "After olv." << std::endl;
 		} catch (CORBA::SystemException& ex) {
 			return 1;
 		}

@@ -41,3 +41,7 @@ if(WIN32)
   set_target_properties(${ZLIB_LIBRARY} PROPERTIES COMPILE_FLAGS -Ob1)
   set_target_properties(${ZLIB_LIBRARY} PROPERTIES DEBUG_POSTFIX d )
 endif() 
+
+if (UNIX)
+  install(TARGETS ${ZLIB_LIBRARY} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()

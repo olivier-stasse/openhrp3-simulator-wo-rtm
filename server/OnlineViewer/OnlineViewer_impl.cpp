@@ -51,7 +51,7 @@ void OnlineViewer_impl::clearData()
 
 void OnlineViewer_impl::drawScene(const WorldState & wstate)
 {
-
+  main_window_.update(wstate);
 }
 
 void OnlineViewer_impl::setLineWidth(CORBA::Float width)

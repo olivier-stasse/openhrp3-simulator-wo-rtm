@@ -404,7 +404,6 @@ module OpenHRP {
     LongSequence  textureCoordIndices;
     DblArray9	  textransformMatrix;
   };
-
   typedef sequence<AppearanceInfo> AppearanceInfoSequence;
 
 
