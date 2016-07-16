@@ -1,6 +1,8 @@
-@CMAKE_INSTALL_PREFIX@/bin/openhrp-model-loader &
-@CMAKE_INSTALL_PREFIX@/bin/openhrp-collision-detector &
-@CMAKE_INSTALL_PREFIX@/bin/openhrp-aist-dynamics-simulator &
-@CMAKE_INSTALL_PREFIX@/bin/gepetto-online-viewer &
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-model-loader &> /tmp/openhrp-model-loader.log &
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-collision-detector &> /tmp/openhrp-collision-detector.log &
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-aist-dynamics-simulator &> /tmp/openhrp-aist-dynamics.log &
+@CMAKE_INSTALL_PREFIX@/bin/gepetto-online-viewer &> /tmp/gepetto-viewer.log &
+@CMAKE_INSTALL_PREFIX@/bin/controller-sample &> /tmp/controller-sample.log &
 /bin/sleep 1
-@CMAKE_INSTALL_PREFIX@/example/@PROJECT_NAME@/scheduler/scheduler -url @CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/longfloor.wrl @CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/sample.wrl
+@CMAKE_INSTALL_PREFIX@/example/@PROJECT_NAME@/scheduler/scheduler -url @CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/longfloor.wrl @CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/sample.wrl -serverName SamplePDController
+

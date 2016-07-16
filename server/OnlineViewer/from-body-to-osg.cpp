@@ -305,7 +305,7 @@ void FromBodyToOsg::insert_mesh(GeometricPrimitiveInsertParameters &aGPIP)
 {
   osg::Geode* mesh_geode = new osg::Geode();
   ::osg::GroupRefPtr agrpref_ptr = 
-      aGPIP.an_olv_link_info->grp_snd_id->getGroupOsgNode();
+      osg::GroupRefPtr(aGPIP.an_olv_link_info->grp_snd_id->asGroup());
   agrpref_ptr->addChild(mesh_geode);
 
   osg::Geometry* mesh_geometry = new osg::Geometry();

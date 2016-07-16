@@ -3,6 +3,7 @@
 #include <hrpModel/ModelLoaderUtil.h>
 #include <hrpCorba/DynamicsSimulator.hh>
 #include <hrpUtil/Eigen3d.h>
+#include <hrpCorba/Controller.hh>
 #include <fstream>
 
 using namespace std;
@@ -43,14 +44,16 @@ X_ptr checkCorbaServer(std::string n, CosNaming::NamingContext_var &cxt)
 int main(int argc, char* argv[]) 
 {
 	double timeStep = 0.001;  // (s)
-	double controlTimeStep = 0.002;
-	double EndTime = 13.0;
+	double controlTimeStep = 0.001;
+	double EndTime = 2000.0;
 
 	string Model[2], ModelFname[2];
 	double world_gravity = 9.8;  // default gravity acceleration [m/s^2]
 	double statFric,slipFric;
 	statFric = slipFric = 0.5;   // static/slip friction coefficient 
 	double culling_thresh = 0.01;
+	std::string controllerName;
+	bool controller_found=false;
 
 	for (int i=1; i<argc; i++)
 		{
@@ -69,6 +72,11 @@ int main(int argc, char* argv[])
 				{
 					timeStep = atof(argv[++i]);
 				}
+			else if (strcmp("-serverName", argv[i])==0)
+				{
+					controllerName = argv[++i];
+				}
+			
 		}
 
 	for(int j = 0; j < 2; j++)
@@ -156,7 +164,10 @@ int main(int argc, char* argv[])
 	// initial position and orientation
 	Vector3  waist_p;
 	Matrix33 waist_R;
-	waist_p << 0, 0, 0.7135;
+	if (!strcmp(body->name(),"HRP2"))
+		waist_p << 0, 0, 0.705;
+	else
+		waist_p << 0, 0, 0.7135;
 	waist_R = Matrix33::Identity();
 
 	DblSequence trans;
@@ -167,7 +178,7 @@ int main(int argc, char* argv[])
 	}
 	dynamicsSimulator->setCharacterLinkData( body->name(), "WAIST", DynamicsSimulator::ABS_TRANSFORM, trans );
 	DblSequence angle;
-	if (body->name()=="sample")
+	if (!strcmp(body->name(),"sample"))
 		{
 			angle.length(29);
 			angle[0] = 0.0;         angle[1] = -0.0360373;  
@@ -187,7 +198,7 @@ int main(int argc, char* argv[])
 			angle[23] = 0.0;	angle[24] = 0.0;  angle[25] = 0.0;        
 			angle[26] = 0.0;  angle[27] = 0.0;  angle[28] = 0.0;
 		}
-	else 	if (body->name()=="HRP2")
+	else 	if (!strcmp(body->name(),"HRP2"))
 		{
 			angle[0] = 0.0    ; angle[1]  = 0.0     ; angle[2] = -0.45379;
 			angle[3] = 0.87266; angle[4]  =-0.41888 ; angle[5] = 0.0;
@@ -217,18 +228,30 @@ int main(int argc, char* argv[])
 	dynamicsSimulator->initSimulation();
         
 	// ==================  Controller setup ==========================
-	// Controller_var controller;
-	// controller = checkCorbaServer <Controller, Controller_var> ("SamplePDController", cxt);
+	Controller_var controller;
+	try 
+		{
+			controller = checkCorbaServer <Controller, Controller_var> (controllerName.c_str(), cxt);
+			controller_found = true;
+		}
+	catch (CORBA::SystemException& ex) 
+		{
+			cerr << "Failed to connect to " << controllerName.c_str() << endl;
+			controller_found = false;
+		}
 
-	// if (CORBA::is_nil(controller)) {
-	// 	std::cerr << "Controller not found" << std::endl;
-	// }
+	if (CORBA::is_nil(controller)) {
+	 	std::cerr << "Controller " << controllerName << " not found" << std::endl;
+	}
 
-	// controller->setModelName(body->name());
-	// controller->setDynamicsSimulator(dynamicsSimulator);
-	// controller->initialize();
-	// controller->setTimeStep(controlTimeStep);
-	// controller->start();
+	if (controller_found)
+		{
+			controller->setModelName(body->name());
+			controller->setDynamicsSimulator(dynamicsSimulator);
+			controller->initialize();
+			controller->setTimeStep(controlTimeStep);
+			controller->start();
+		}
 
 	// ==================  log file   ======================
 	static ofstream log_file;
@@ -247,8 +270,11 @@ int main(int argc, char* argv[])
 			j++;
 		}
 
-		// if(control)
-		// 	controller->input();
+		if(control)
+			{
+				if (controller_found)
+					controller->input();
+			}
 
 		i++;
 		if (i%1000==0)
@@ -257,8 +283,9 @@ int main(int argc, char* argv[])
 		time = timeStep * i;
 		controlTime = controlTimeStep * j;
 
-		// if(control)
-		// 	controller->control();
+		if(control)
+			if(controller_found)
+				controller->control();
       
 		// ================== simulate one step ==============
 		dynamicsSimulator->stepSimulation();					
@@ -279,11 +306,14 @@ int main(int argc, char* argv[])
 
 		// ================== log data save =====================
 		log_file << time << " ";
-		log_file << waist_vw[2] << " ";
+		log_file << waist_pR[0] << " " << waist_pR[1] << " " << waist_pR[2] << " " <<waist_vw[2] << " ";
 		log_file << endl;
 
-		// if(control)
-		// 	controller->output();
+		if(control)
+			{
+				if(controller_found)
+					controller->output();
+			}
 
 		if( time > EndTime ) break;
 

@@ -15,13 +15,13 @@ INCLUDE_DIRECTORIES(${GEPETTO_VIEWER_INCLUDEDIR})
 add_executable(${program} ${sources})
 
 if(UNIX)
+  pkg_config_use_dependency(${program} gepetto-viewer)
   target_link_libraries(${program}
     hrpUtil-${OPENHRP_LIBRARY_VERSION}
     hrpModel-${OPENHRP_LIBRARY_VERSION}
     hrpCorbaStubSkel-${OPENHRP_LIBRARY_VERSION}
     pthread
     ${OMNIORB_LIBRARIES} ${Boost_REGEX_LIBRARY} )
-  pkg_config_use_dependency(${program} gepetto-viewer)
 elseif(WIN32)
   set_target_properties(${program} PROPERTIES DEBUG_POSTFIX d)
   target_link_libraries(${program}

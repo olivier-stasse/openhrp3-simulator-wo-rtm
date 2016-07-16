@@ -38,7 +38,7 @@ include(FindPkgConfig)
 include(CheckIncludeFiles)
 
 # Check boost
-find_package(Boost 1.35.0 REQUIRED COMPONENTS filesystem signals system regex)
+find_package(Boost 1.35.0 REQUIRED COMPONENTS program_options filesystem signals system regex)
 
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})

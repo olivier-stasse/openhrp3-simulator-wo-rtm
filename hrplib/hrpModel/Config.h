@@ -6,8 +6,8 @@
 #define HRPMODEL_VERSION_MINOR 
 #define HRPMODEL_VERSION_MICRO 
 
-#define OPENHRP_DIR "/home/ostasse/devel/ros-indigo-1/install"
-#define OPENHRP_SHARE_DIR "/home/ostasse/devel/ros-indigo-1/install/"
+#define OPENHRP_DIR "/home/ostasse/devel/test/install"
+#define OPENHRP_SHARE_DIR "/home/ostasse/devel/test/install/"
 #define OPENHRP_RELATIVE_SHARE_DIR ""
 
 // for Windows DLL export 

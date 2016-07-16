@@ -768,8 +768,8 @@ void DynamicsSimulator_impl::getCharacterLinkData
 {
     if(debugMode){
         cout << "DynamicsSimulator_impl::getCharacterLinkData("
-             << characterName << ", " << linkName << ", "
-             << getLabelOfLinkDataType(type) << ")" << endl;
+	      << characterName << ", " << linkName << ", "
+	      << getLabelOfLinkDataType(type) << ")" << endl;
     }
 
     BodyPtr body = world.body(characterName);

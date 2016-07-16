@@ -8,5 +8,6 @@ set(IDL_FILE_BASENAMES
   ViewSimulator
   OnlineViewer
   Localization
+  Controller
 )
 

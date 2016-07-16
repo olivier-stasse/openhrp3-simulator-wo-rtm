@@ -26,6 +26,6 @@ namespace hrp
     HRP_UTIL_EXPORT OpenHRP::OnlineViewer_var getOnlineViewer(int argc, char **argv);
     HRP_UTIL_EXPORT OpenHRP::OnlineViewer_var getOnlineViewer(CORBA_ORB_var orb);
     HRP_UTIL_EXPORT OpenHRP::OnlineViewer_var getOnlineViewer(CosNaming::NamingContext_var cxt);
-};
+}
 
 #endif

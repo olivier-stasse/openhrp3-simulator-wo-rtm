@@ -12,6 +12,7 @@
     \author Shin'ichiro Nakaoka
 */
 
+
 #include "Body.h"
 #include "Link.h"
 #include "JointPath.h"
@@ -21,6 +22,8 @@
 #include <hrpCollision/ColdetModel.h>
 #include <map>
 #include <cstdlib>
+
+#include <fstream>
 
 using namespace hrp;
 using namespace std;
@@ -259,6 +262,7 @@ void Body::updateLinkTree()
 */
 Link* Body::link(const std::string& name) const
 {
+
     NameToLinkMap::const_iterator p = nameToLinkMap.find(name);
     return (p != nameToLinkMap.end()) ? p->second : 0;
 }
