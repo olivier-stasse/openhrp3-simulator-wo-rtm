@@ -43,7 +43,7 @@ X_ptr checkCorbaServer(std::string n, CosNaming::NamingContext_var &cxt)
 
 int main(int argc, char* argv[]) 
 {
-	double timeStep = 0.001;  // (s)
+	double timeStep = 0.0002;  // (s)
 	double controlTimeStep = 0.001;
 	double EndTime = 2000.0;
 
@@ -153,6 +153,8 @@ int main(int argc, char* argv[])
 	cout << "Character  :" << body->name() << endl;
 	dynamicsSimulator->registerCharacter(body->name(), body);
 
+
+	
 	dynamicsSimulator->init(timeStep, DynamicsSimulator::RUNGE_KUTTA, DynamicsSimulator::ENABLE_SENSOR);
 	DblSequence3 g;
 	g.length(3);
@@ -167,7 +169,7 @@ int main(int argc, char* argv[])
 	if (!strcmp(body->name(),"HRP2"))
 		waist_p << 0, 0, 0.705;
 	else
-		waist_p << 0, 0, 0.7135;
+		waist_p << 0, 0, 0.6487;
 	waist_R = Matrix33::Identity();
 
 	DblSequence trans;
@@ -198,8 +200,9 @@ int main(int argc, char* argv[])
 			angle[23] = 0.0;	angle[24] = 0.0;  angle[25] = 0.0;        
 			angle[26] = 0.0;  angle[27] = 0.0;  angle[28] = 0.0;
 		}
-	else 	if (!strcmp(body->name(),"HRP2"))
+	else 	if (!strcmp(body->name(),"HRP2JRL"))
 		{
+			angle.length(40);
 			angle[0] = 0.0    ; angle[1]  = 0.0     ; angle[2] = -0.45379;
 			angle[3] = 0.87266; angle[4]  =-0.41888 ; angle[5] = 0.0;
 
@@ -216,6 +219,10 @@ int main(int argc, char* argv[])
 			angle[23] = 0.2618; angle[24] = 0.17453 ; angle[25] = 0.0;
 			angle[26] =-0.5236; angle[27] = 0.0     ; angle[28] = 0.0;
 			angle[29] = 0.17453;
+			angle[30] =-0.17453; angle[31] = 0.17453;	 angle[32] = -0.17453;		angle[33] = 0.17453;			angle[34] = -0.17453;
+			angle[35] =-0.17453; angle[36] = 0.17453;	 angle[37] = -0.17453;		angle[38] = 0.17453;			angle[39] = -0.17453;
+			
+
 		}
 	dynamicsSimulator->setCharacterAllLinkData( body->name(), DynamicsSimulator::JOINT_VALUE, angle );
 	dynamicsSimulator->calcWorldForwardKinematics();
@@ -225,6 +232,50 @@ int main(int argc, char* argv[])
 	C.length(0);
 	dynamicsSimulator->registerCollisionCheckPair(floor->name(),"", body->name() ,"",
 																								statFric,slipFric,K,C,culling_thresh,0.0);
+
+	DblSequence3 aLink1LocalPos,aLink2LocalPos;
+	aLink1LocalPos.length(3); aLink2LocalPos.length(3);
+	aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = 0.004; 	aLink1LocalPos[2] = -0.11;
+	aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
+	DblSequence3 aJointAxis;
+	aJointAxis.length(3);
+	aJointAxis[0] = 1.0; aJointAxis[1] = 0.0; aJointAxis[2] = 0.0;
+
+	// Close the kinematic chain of the Right hand - gripper
+	dynamicsSimulator->registerExtraJoint(body->name(), "RARM_JOINT5",
+																				body->name(), "RHAND_JOINT1",
+																				aLink1LocalPos, aLink2LocalPos,
+																				ExtraJointType::EJ_XYZ,
+																				aJointAxis,
+																				"RL6RL1");
+
+	aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = -0.004; 	aLink1LocalPos[2] = -0.11;
+	aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
+	dynamicsSimulator->registerExtraJoint(body->name(), "RARM_JOINT5",
+																				body->name(), "RHAND_JOINT4",
+																				aLink1LocalPos, aLink2LocalPos,
+																				ExtraJointType::EJ_XYZ,
+																				aJointAxis,
+																				"RH2RL4");
+	
+	// Close the kinematic chain of the Left hand - gripper
+	aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = -0.004; 	aLink1LocalPos[2] = -0.11;
+	aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
+	dynamicsSimulator->registerExtraJoint(body->name(), "LARM_JOINT5",
+																				body->name(), "LHAND_JOINT1",
+																				aLink1LocalPos, aLink2LocalPos,
+																				ExtraJointType::EJ_XYZ,
+																				aJointAxis,
+																				"RL6RL1");
+	aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = -0.004; 	aLink1LocalPos[2] = -0.11;
+	aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
+	dynamicsSimulator->registerExtraJoint(body->name(), "LARM_JOINT5",
+																				body->name(), "LHAND_JOINT4",
+																				aLink1LocalPos, aLink2LocalPos,
+																				ExtraJointType::EJ_XYZ,
+																				aJointAxis,
+																				"RH2RL4");
+
 	dynamicsSimulator->initSimulation();
         
 	// ==================  Controller setup ==========================
@@ -299,14 +350,20 @@ int main(int argc, char* argv[])
 		}
 	
 		// ===================== get robot status ===================
-		DblSequence_var waist_pR;  // position and attitude
+		DblSequence_var waist_pR,lleg_joint5,rarm_joint5, rhand_joint1;  // position and attitude
 		DblSequence_var waist_vw;  // linear and angular velocities
 		dynamicsSimulator->getCharacterLinkData(body->name(), "WAIST", DynamicsSimulator::ABS_TRANSFORM, waist_pR);
-		dynamicsSimulator->getCharacterLinkData(body->name(), "WAIST", DynamicsSimulator::ABS_VELOCITY,  waist_vw);
+		dynamicsSimulator->getCharacterLinkData(body->name(), "LLEG_JOINT5", DynamicsSimulator::ABS_TRANSFORM, lleg_joint5);
+		dynamicsSimulator->getCharacterLinkData(body->name(), "RARM_JOINT5", DynamicsSimulator::ABS_TRANSFORM, rarm_joint5);
+		dynamicsSimulator->getCharacterLinkData(body->name(), "RHAND_JOINT1", DynamicsSimulator::ABS_TRANSFORM, rhand_joint1);
+		//		dynamicsSimulator->getCharacterLinkData(body->name(), "RARM_LINK6", DynamicsSimulator::ABS_VELOCITY,  waist_vw);
 
 		// ================== log data save =====================
 		log_file << time << " ";
-		log_file << waist_pR[0] << " " << waist_pR[1] << " " << waist_pR[2] << " " <<waist_vw[2] << " ";
+		log_file << waist_pR[0] << " " << waist_pR[1] << " " << waist_pR[2] << " " << " "
+						 << lleg_joint5[0] << " " << lleg_joint5[1] << " " << lleg_joint5[2]  <<  " " 
+						 << rarm_joint5[0] << " " << rarm_joint5[1] << " " << rarm_joint5[2]  <<  " " 
+						 << rhand_joint1[0] << " " << rhand_joint1[1] << " " << rhand_joint1[2] ;
 		log_file << endl;
 
 		if(control)
@@ -316,7 +373,9 @@ int main(int argc, char* argv[])
 			}
 
 		if( time > EndTime ) break;
-
+		usleep(5000);
+		//std::cout << "time: " << time << std::endl;
+			
 	}
 
 	//controller->stop();

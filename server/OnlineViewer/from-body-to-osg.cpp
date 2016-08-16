@@ -311,6 +311,13 @@ void FromBodyToOsg::insert_mesh(GeometricPrimitiveInsertParameters &aGPIP)
   osg::Geometry* mesh_geometry = new osg::Geometry();
   mesh_geode->addDrawable(mesh_geometry);
   
+  /* TO DO 
+  aGPIP.an_olv_link_info->list_of_shapes[aGPIP.id_in_list_of_shapes] = 
+    mesh_geode;
+  aGPIP.an_olv_link_info->set_shape_transform_matrix(*aGPIP.a_trans_shape_id,
+						     aGPIP.id_in_list_of_shapes,
+						     false);
+  */
 
   osg::Vec3Array* mesh_vertices = new osg::Vec3Array;
 

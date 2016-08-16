@@ -35,8 +35,8 @@ HRP2OH2SOT::HRP2OH2SOT()
 
   SotLoaderBasic();
 
-  robot_config_.nb_dofs =30;
-  nb_dofs_ = 30;
+  robot_config_.nb_dofs =40;
+  nb_dofs_ = 40;
   P_.resize(nb_dofs_);
   I_.resize(nb_dofs_);
   D_.resize(nb_dofs_);
@@ -52,6 +52,10 @@ HRP2OH2SOT::HRP2OH2SOT()
 
   perform_control_ = false;
   RESETDEBUG5();
+
+  std::ofstream LogFile;
+  LogFile.open("/tmp/angle.dat",std::ofstream::out);
+  LogFile.close();
 }
 
 HRP2OH2SOT::~HRP2OH2SOT()
@@ -96,53 +100,77 @@ void HRP2OH2SOT::initref()
   qref_[27] = 0.0    ; dqref_[27] = 0.0;
   qref_[28] = 0.0    ; dqref_[28] = 0.0;
   qref_[29] = 0.17453; dqref_[29] = 0.0;
+
+  qref_[30] = -0.17453; dqref_[30] = 0.0;
+  qref_[31] = 0.17453; dqref_[31] = 0.0;
+  qref_[32] = -0.17453; dqref_[32] = 0.0;
+  qref_[33] = 0.17453; dqref_[33] = 0.0;
+  qref_[34] = -0.17453; dqref_[34] = 0.0;
+
+  qref_[35] = -0.17453; dqref_[35] = 0.0;
+  qref_[36] = 0.17453; dqref_[36] = 0.0;
+  qref_[37] = -0.17453; dqref_[37] = 0.0;
+  qref_[38] = 0.17453; dqref_[38] = 0.0;
+  qref_[39] = -0.17453; dqref_[39] = 0.0;
+    
   
-  for(unsigned int i=0;i<30;i++)
-    { 
-      qref_[i] = 0.0; 
-      dqref_[i] = 0.0; 
-    }
+  // for(unsigned int i=0;i<40;i++)
+  //   { 
+  //     qref_[i] = 0.0; 
+  //     dqref_[i] = 0.0; 
+  //   }
   
 }
 
 void HRP2OH2SOT::initpids()
 {
-  P_[ 0]=5000; D_[ 0] = 10;
-  P_[ 1]=5000; D_[ 1] = 10;
-  P_[ 2]=5000; D_[ 2] = 10;
-  P_[ 3]=3000; D_[ 3] = 10;
-  P_[ 4]=3000; D_[ 4] = 10;
-  P_[ 5]=3000; D_[ 5] = 10;
+  P_[ 0]=300; D_[ 0] = 1.5;
+  P_[ 1]=9000; D_[ 1] = 45;
+  P_[ 2]=9000; D_[ 2] = 45;
+  P_[ 3]=12000.0; D_[ 3] = 60.0;
+  P_[ 4]=300; D_[ 4] = 1.5;
+  P_[ 5]=300; D_[ 5] = 1.5;
 
-  P_[ 6]=5000; D_[ 6] = 10;
-  P_[ 7]=5000; D_[ 7] = 10;
-  P_[ 8]=5000; D_[ 8] = 10;
-  P_[ 9]=3000; D_[ 9] = 10;
-  P_[10]=3000; D_[10] = 10;
-  P_[11]=3000; D_[11] = 10;
+  P_[ 6]=300; D_[ 6] = 1.5;
+  P_[ 7]=9000; D_[ 7] = 45;
+  P_[ 8]=9000; D_[ 8] = 45;
+  P_[ 9]=12000; D_[ 9] = 60;
+  P_[10]=300; D_[10] = 1.5;
+  P_[11]=300; D_[11] = 1.5;
 
-  P_[12]=3000; D_[12] = 10;
-  P_[13]=3000; D_[13] = 10;
+  P_[12]=9000; D_[12] = 45.0;
+  P_[13]=9000; D_[13] = 45.0;
 
-  P_[14]=3000; D_[14] = 10;
-  P_[15]=3000; D_[15] = 10;
+  P_[14]=400; D_[14] = 2.0;
+  P_[15]=400; D_[15] = 2.0;
 
-  P_[16]=5000; D_[16] = 10;
-  P_[17]=5000; D_[17] = 10;
-  P_[18]=3000; D_[18] = 10;
-  P_[19]=3000; D_[19] = 10;
-  P_[20]=3000; D_[20] = 10;
-  P_[21]=3000; D_[21] = 10;
-  P_[22]=3000; D_[22] = 10;  
+  P_[16]=1000; D_[16] = 5.0;
+  P_[17]=4000; D_[17] = 20.0;
+  P_[18]=400; D_[18] = 2.0;
+  P_[19]=400; D_[19] = 2.0;
+  P_[20]=400; D_[20] = 2.0;
+  P_[21]=400; D_[21] = 2.0;
+  P_[22]=200.0; D_[22] = 1.0;  
 
-  P_[23]=3000; D_[23] = 10;
-  P_[24]=3000; D_[24] = 10;
-  P_[25]=3000; D_[25] = 10;  
-  P_[26]=3000; D_[26] = 10;
-  P_[27]=3000; D_[27] = 10;
-  P_[28]=3000; D_[28] = 10;  
-  P_[29]=3000; D_[29] = 10;  
+  P_[23]=1000; D_[23] = 5.0;
+  P_[24]=4000; D_[24] = 20.0;
+  P_[25]=400; D_[25] = 2.0;  
+  P_[26]=400; D_[26] = 2.0;
+  P_[27]=400; D_[27] = 2.0;
+  P_[28]=400; D_[28] = 2.0;  
+  P_[29]=0; D_[29] = 0.;  
 
+  P_[30]=0.0; D_[30] = 0.0;  
+  P_[31]=0.0; D_[31] = 0.0;  
+  P_[32]=200.0; D_[32] = 1.0;  
+  P_[33]=0.0; D_[33] = 0.0;  
+  P_[34]=0.0; D_[34] = 0.0;  
+
+  P_[35]=0.2; D_[35] = 0.0;  
+  P_[36]=0.2; D_[36] = 0.0;  
+  P_[37]=00; D_[37] = 0.0;  
+  P_[38]=0.2; D_[38] = 0.0;  
+  P_[39]=0.2; D_[39] = 0.0;  
 }
 
 void HRP2OH2SOT::initLinkNames()
@@ -184,6 +212,18 @@ void HRP2OH2SOT::initLinkNames()
   aLinkName = "LARM_JOINT4";listOfLinks_.push_back(aLinkName);
   aLinkName = "LARM_JOINT5";listOfLinks_.push_back(aLinkName);
   aLinkName = "LARM_JOINT6";listOfLinks_.push_back(aLinkName);
+
+  aLinkName = "RHAND_JOINT0";listOfLinks_.push_back(aLinkName);
+  aLinkName = "RHAND_JOINT1";listOfLinks_.push_back(aLinkName);
+  aLinkName = "RHAND_JOINT2";listOfLinks_.push_back(aLinkName);
+  aLinkName = "RHAND_JOINT3";listOfLinks_.push_back(aLinkName);
+  aLinkName = "RHAND_JOINT4";listOfLinks_.push_back(aLinkName);
+
+  aLinkName = "LHAND_JOINT0";listOfLinks_.push_back(aLinkName);
+  aLinkName = "LHAND_JOINT1";listOfLinks_.push_back(aLinkName);
+  aLinkName = "LHAND_JOINT2";listOfLinks_.push_back(aLinkName);
+  aLinkName = "LHAND_JOINT3";listOfLinks_.push_back(aLinkName);
+  aLinkName = "LHAND_JOINT4";listOfLinks_.push_back(aLinkName);
    
 }
 
@@ -258,6 +298,10 @@ void HRP2OH2SOT::initialize()
 void HRP2OH2SOT::input()
 {
   
+  std::ofstream LogFile;
+
+  LogFile.open("/tmp/angle.dat",std::ofstream::app);
+
   for(unsigned int i=0;i<listOfLinks_.size();i++)
     {
       std::string aLinkName = listOfLinks_[i];
@@ -268,6 +312,7 @@ void HRP2OH2SOT::input()
 					       aLinkName.c_str(),
 					       linkDataType,var_q);
       q_[i] = var_q[0];
+      LogFile << q_[i] << " ";
       linkDataType = OpenHRP::DynamicsSimulator::JOINT_VELOCITY;
       OpenHRP::DblSequence_var var_dq;
       dynamicsSimulator_->getCharacterLinkData(modelName_.c_str(),
@@ -276,6 +321,8 @@ void HRP2OH2SOT::input()
       dq_[i] = var_dq[0];
 
     }
+  LogFile << std::endl;
+  LogFile.close();
   fillSensors(sensorsIn_);
 }
 
@@ -283,24 +330,22 @@ void HRP2OH2SOT::output()
 {
   for(unsigned int i=0;i<listOfLinks_.size();i++)
     {
-      
       std::string aLinkName = listOfLinks_[i];
       sendto_[0] = torques_[i];
       OpenHRP::DynamicsSimulator::LinkDataType linkDataType = OpenHRP::DynamicsSimulator::JOINT_TORQUE;
       dynamicsSimulator_->setCharacterLinkData(modelName_.c_str(),
 					       aLinkName.c_str(),
 					       linkDataType,sendto_);
-    }
-					      
+    }					      
 }
 
 
 void HRP2OH2SOT::control()
 {
-  std::cout << "perform_control_ :" << perform_control_ 
+  /* std::cout << "perform_control_ :" << perform_control_ 
 	    << "dynamic_graph_stopped_ :" << dynamic_graph_stopped_ 
 	    << std::endl;
-
+  */
   if (perform_control_ & !dynamic_graph_stopped_)
     {
       try
@@ -315,10 +360,10 @@ void HRP2OH2SOT::control()
 
   for(unsigned int i=0;i<nb_dofs_;i++)
     {
-      std::cout << i << " : (" << q_[i] << " , " << qref_[i]  << ")" << std::endl;
+      //std::cout << i << " : (" << q_[i] << " , " << qref_[i]  << ")" << std::endl;
       torques_[i] = -(q_[i] - qref_[i] ) *P_[i] 
 	- (dq_[i] -dqref_[i]) * D_[i];
-      torques_[i] =0.0;
+      //      torques_[i] =0.0;
     }
 }
 

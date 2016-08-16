@@ -117,7 +117,12 @@ bool TestKeyboardEventHandler::handle(const osgGA::GUIEventAdapter& ea,
 
           case 'c':
             {
-	      osg::Matrixd aViewMatrix(0.121563,0.99252,0.0112091,0,
+	      osg::Matrixd aViewMatrix0(0.393369,0.917324,0.0614601,0,
+					-0.230706,0.0337793,0.972437,0,
+					0.889964,-0.396706,0.22492,0,
+					0.364105,-0.393902,0.680456,1);
+
+	      osg::Matrixd aViewMatrix1(0.121563,0.99252,0.0112091,0,
 					-0.118254,0.00326934,0.992978,0,
 					0.985514,-0.122035,0.117767,0,
 					7.17417,-0.107913,1.12234,1);
@@ -125,15 +130,23 @@ bool TestKeyboardEventHandler::handle(const osgGA::GUIEventAdapter& ea,
 					0.0106572,-0.0359862,0.999295,0,
 					-0.153678,0.987421,0.0371975,0,
 					-2.17096,8.09489,1.20741,1);
-
+	      osg::Matrixd aViewMatrix3(-0.997808,-0.0612453,-0.0250599,0,
+					-0.0198733,-0.0838741,0.996278,0,
+					-0.0631193,0.994592,0.0824732,0,
+					-0.171284,3.21756,0.985355,1);
               static unsigned int roundrobin=0;
               if (roundrobin==0)
-                { viewer_ptr_.get()->getCameraManipulator()->setByMatrix(aViewMatrix); }
+                { viewer_ptr_.get()->getCameraManipulator()->setByMatrix(aViewMatrix0); }
               else if (roundrobin==1)
+                { viewer_ptr_.get()->getCameraManipulator()->setByMatrix(aViewMatrix1); }
+              else if (roundrobin==2)
                 { viewer_ptr_.get()->getCameraManipulator()->setByMatrix(aViewMatrix2); }
+              else if (roundrobin==3)
+                { viewer_ptr_.get()->getCameraManipulator()->setByMatrix(aViewMatrix3); }
+
               std::cout << "roundrobin:" << roundrobin<<std::endl;
               roundrobin++;
-              if (roundrobin==2)
+              if (roundrobin==4)
                 roundrobin=0;
               return false;
             }
