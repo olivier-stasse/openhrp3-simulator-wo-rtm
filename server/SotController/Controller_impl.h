@@ -67,6 +67,8 @@ public:
 	/// Set the openhrp-to-sot-robot interface library.
 	/// In unix it should the path towards the library.
 	void set_path_to_library(std::string & path_to_library);
+	/// Set the pid gains filename
+	void set_path_to_pid_gains(std::string & path_to_pid_gains);
 
 private:
 	std::string modelName;

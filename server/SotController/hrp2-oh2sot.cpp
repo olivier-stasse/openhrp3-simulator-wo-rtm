@@ -43,15 +43,24 @@ HRP2OH2SOT::HRP2OH2SOT()
 
   q_.resize(nb_dofs_);
   qref_.resize(nb_dofs_);
+  pqref_.resize(nb_dofs_);
   dq_.resize(nb_dofs_);
   dqref_.resize(nb_dofs_);
+  pdqref_.resize(nb_dofs_);
+  ddqref_.resize(nb_dofs_);
   torques_.resize(nb_dofs_);
   
   sendto_.length(1);
   recvfrom_.length(1);
 
   perform_control_ = false;
+  
+  control_ticks_ = 0;
+  control_ticks_max_ = 5;
+  dt_ = 0.005;
   RESETDEBUG5();
+
+  cumul_err_ = 0.0;
 
   std::ofstream LogFile;
   LogFile.open("/tmp/angle.dat",std::ofstream::out);
@@ -114,63 +123,34 @@ void HRP2OH2SOT::initref()
   qref_[39] = -0.17453; dqref_[39] = 0.0;
     
   
-  // for(unsigned int i=0;i<40;i++)
-  //   { 
-  //     qref_[i] = 0.0; 
-  //     dqref_[i] = 0.0; 
-  //   }
+  for(unsigned int i=0;i<40;i++)
+    { 
+      pqref_[i] = qref_[i];
+      dqref_[i] = 0.0; 
+      pdqref_[i] = dqref_[i];
+      ddqref_[i] = 0.0; 
+    }
   
 }
 
 void HRP2OH2SOT::initpids()
 {
-  P_[ 0]=300; D_[ 0] = 1.5;
-  P_[ 1]=9000; D_[ 1] = 45;
-  P_[ 2]=9000; D_[ 2] = 45;
-  P_[ 3]=12000.0; D_[ 3] = 60.0;
-  P_[ 4]=300; D_[ 4] = 1.5;
-  P_[ 5]=300; D_[ 5] = 1.5;
+  
+  std::ifstream ifs;
+  ifs.open(robot_config_.pid_gains_filename.c_str());
 
-  P_[ 6]=300; D_[ 6] = 1.5;
-  P_[ 7]=9000; D_[ 7] = 45;
-  P_[ 8]=9000; D_[ 8] = 45;
-  P_[ 9]=12000; D_[ 9] = 60;
-  P_[10]=300; D_[10] = 1.5;
-  P_[11]=300; D_[11] = 1.5;
-
-  P_[12]=9000; D_[12] = 45.0;
-  P_[13]=9000; D_[13] = 45.0;
-
-  P_[14]=400; D_[14] = 2.0;
-  P_[15]=400; D_[15] = 2.0;
-
-  P_[16]=1000; D_[16] = 5.0;
-  P_[17]=4000; D_[17] = 20.0;
-  P_[18]=400; D_[18] = 2.0;
-  P_[19]=400; D_[19] = 2.0;
-  P_[20]=400; D_[20] = 2.0;
-  P_[21]=400; D_[21] = 2.0;
-  P_[22]=200.0; D_[22] = 1.0;  
-
-  P_[23]=1000; D_[23] = 5.0;
-  P_[24]=4000; D_[24] = 20.0;
-  P_[25]=400; D_[25] = 2.0;  
-  P_[26]=400; D_[26] = 2.0;
-  P_[27]=400; D_[27] = 2.0;
-  P_[28]=400; D_[28] = 2.0;  
-  P_[29]=0; D_[29] = 0.;  
-
-  P_[30]=0.0; D_[30] = 0.0;  
-  P_[31]=0.0; D_[31] = 0.0;  
-  P_[32]=200.0; D_[32] = 1.0;  
-  P_[33]=0.0; D_[33] = 0.0;  
-  P_[34]=0.0; D_[34] = 0.0;  
-
-  P_[35]=0.2; D_[35] = 0.0;  
-  P_[36]=0.2; D_[36] = 0.0;  
-  P_[37]=00; D_[37] = 0.0;  
-  P_[38]=0.2; D_[38] = 0.0;  
-  P_[39]=0.2; D_[39] = 0.0;  
+  if (!ifs.is_open())
+    return;
+  
+  //  Read PIDs.
+  for(int i=0;i<40;i++)
+    {
+      ifs >> D_[i];
+      ifs >> I_[i];
+      ifs >> P_[i];
+      std::cout << i << " - " << D_[i] << " " << I_[i] << " " << P_[i] << std::endl;
+    }
+  ifs.close();
 }
 
 void HRP2OH2SOT::initLinkNames()
@@ -328,15 +308,42 @@ void HRP2OH2SOT::input()
 
 void HRP2OH2SOT::output()
 {
-  for(unsigned int i=0;i<listOfLinks_.size();i++)
+  if (0)
     {
-      std::string aLinkName = listOfLinks_[i];
-      sendto_[0] = torques_[i];
-      OpenHRP::DynamicsSimulator::LinkDataType linkDataType = OpenHRP::DynamicsSimulator::JOINT_TORQUE;
-      dynamicsSimulator_->setCharacterLinkData(modelName_.c_str(),
-					       aLinkName.c_str(),
-					       linkDataType,sendto_);
-    }					      
+      for(unsigned int i=0;i<listOfLinks_.size();i++)
+	{
+	  std::string aLinkName = listOfLinks_[i];
+	  sendto_[0] = torques_[i];
+	  OpenHRP::DynamicsSimulator::LinkDataType linkDataType = OpenHRP::DynamicsSimulator::JOINT_TORQUE;
+	  dynamicsSimulator_->setCharacterLinkData(modelName_.c_str(),
+						   aLinkName.c_str(),
+						   linkDataType,sendto_);
+	}					      
+    }
+  else
+    {
+      for(unsigned int i=0;i<listOfLinks_.size();i++)
+	{
+	  std::string aLinkName = listOfLinks_[i];
+	  sendto_[0] = qref_[i];
+	  OpenHRP::DynamicsSimulator::LinkDataType linkDataType = OpenHRP::DynamicsSimulator::JOINT_VALUE;
+	  dynamicsSimulator_->setCharacterLinkData(modelName_.c_str(),
+						   aLinkName.c_str(),
+						   linkDataType,sendto_);
+	  sendto_[0] = dqref_[i];
+	  linkDataType = OpenHRP::DynamicsSimulator::JOINT_VELOCITY;
+	  dynamicsSimulator_->setCharacterLinkData(modelName_.c_str(),
+						   aLinkName.c_str(),
+						   linkDataType,sendto_);
+
+	  sendto_[0] = ddqref_[i];
+	  linkDataType = OpenHRP::DynamicsSimulator::JOINT_ACCELERATION;
+	  dynamicsSimulator_->setCharacterLinkData(modelName_.c_str(),
+						   aLinkName.c_str(),
+						   linkDataType,sendto_);
+
+	}					      
+    }
 }
 
 
@@ -348,20 +355,30 @@ void HRP2OH2SOT::control()
   */
   if (perform_control_ & !dynamic_graph_stopped_)
     {
-      try
+      if (control_ticks_==0)
 	{
-	  m_sotController->setupSetSensors(sensorsIn_);
-	  m_sotController->getControl(controlValues_);
-	} 
-      catch (std::exception &e) 
-	{  ODEBUG5("Exception on Execute: " << e.what());throw e; }
-      readControl(controlValues_);
+	  try
+	    {
+	      m_sotController->setupSetSensors(sensorsIn_);
+	      m_sotController->getControl(controlValues_);
+	    } 
+	  catch (std::exception &e) 
+	    {  ODEBUG5("Exception on Execute: " << e.what());throw e; }
+	  readControl(controlValues_);
+	}
+      control_ticks_++;
+      if (control_ticks_==control_ticks_max_)
+	control_ticks_ = 0;
     }
 
   for(unsigned int i=0;i<nb_dofs_;i++)
     {
+      
       //std::cout << i << " : (" << q_[i] << " , " << qref_[i]  << ")" << std::endl;
+      double error = q_[i] - qref_[i];
+      cumul_err_ -= error;
       torques_[i] = -(q_[i] - qref_[i] ) *P_[i] 
+	+ cumul_err_ * I_[i]
 	- (dq_[i] -dqref_[i]) * D_[i];
       //      torques_[i] =0.0;
     }
@@ -497,16 +514,28 @@ HRP2OH2SOT::readControl(std::map<std::string,dgsot::ControlValues>
   
   for(unsigned int i=0;i<angleControl_.size();i++)
     { 
+      // Update qref from SoT.
+      // dqref and ddref should/could be provided by SoT too.
       qref_[i] = angleControl_[i]; 
       ODEBUG("m_qRef["<<i<<"]=" << qRef_[i]);
+      
+      // Compute speed and acceleration by finite differences.
+      dqref_[i] = (qref_[i] - pqref_[i])/dt_;
+      ddqref_[i] = (dqref_[i]- pdqref_[i])/dt_;
+      
+      // Store previous values.
+      pqref_[i] = qref_[i];
+      pdqref_[i] = dqref_[i];
     }
   if (angleControl_.size()<(unsigned int)robot_config_.nb_dofs)
     {
-      for(unsigned int i=angleControl_.size();
-          i<(unsigned int)robot_config_.nb_dofs
+      for(long unsigned int i=angleControl_.size();
+          i<(long unsigned int)robot_config_.nb_dofs
             ;i++)
         {
           qref_[i] = 0.0;
+	  dqref_[i] = 0.0;
+	  ddqref_[i] = 0.0;
           ODEBUG("m_qRef["<<i<<"]=" << m_qRef.data[i]);
         }
     }
@@ -516,5 +545,10 @@ HRP2OH2SOT::readControl(std::map<std::string,dgsot::ControlValues>
 void HRP2OH2SOT::set_path_to_library(std::string &aLibName)
 {
   robot_config_.libname = aLibName;
+}
+
+void HRP2OH2SOT::set_path_to_pid_gains(std::string &aFileName)
+{
+  robot_config_.pid_gains_filename = aFileName;
 }
 

@@ -29,13 +29,15 @@ int main(int argc, char* argv[])
 
   ros::init(argc,argv,"openhrp_3_hrp2_encapsulator");
 
-  if (argc!=2)
+  if (argc!=3)
     {
-      std::cout << argv[0] << " must have a parameter (path to sot library)."
+      std::cout << argv[0] << " must have two parameter (path to sot library and pid gains)."
 		<< std::endl;
       return -1;
     }
   std::string robot_libname = argv[1];
+  std::string pid_gains_filename = argv[2];
+ 
   
   CORBA::ORB_var orb;
   try 
@@ -59,6 +61,7 @@ int main(int argc, char* argv[])
       CORBA::Object_var hrp2ControllerObj;
       Controller_impl<HRP2OH2SOT> * hrp2ControllerImpl = new Controller_impl<HRP2OH2SOT>(orb);
       hrp2ControllerImpl->set_path_to_library(robot_libname);
+      hrp2ControllerImpl->set_path_to_pid_gains(pid_gains_filename);
       hrp2ControllerObj = hrp2ControllerImpl -> _this();
       CosNaming::Name nc;
       nc.length(1);

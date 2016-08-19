@@ -6,6 +6,7 @@
 #include <gepetto/viewer/leaf-node-cylinder.h>
 #include <gepetto/viewer/leaf-node-cone.h>
 #include <gepetto/viewer/leaf-node-sphere.h>
+#include <gepetto/viewer/leaf-node-mesh.h>
 
 #include <gepetto/viewer/group-node.h>
 
@@ -30,7 +31,7 @@ void FromBodyToOsg::display_appearance(OpenHRP::AppearanceInfo & an_appearance)
 {
   std::cout << "materialIndex: " << an_appearance.materialIndex << std::endl;
   
-  std::cout << "Nb of normals: " << an_appearance.normals.length() << std::endl;
+  std::cout << "Nb of normals: " << an_appearance.normals.length()/3 << std::endl;
   
   if (0)
     {
@@ -303,21 +304,22 @@ void FromBodyToOsg::insert_cylinder(GeometricPrimitiveInsertParameters & aGPIP)
 
 void FromBodyToOsg::insert_mesh(GeometricPrimitiveInsertParameters &aGPIP)
 {
-  osg::Geode* mesh_geode = new osg::Geode();
-  ::osg::GroupRefPtr agrpref_ptr = 
-      osg::GroupRefPtr(aGPIP.an_olv_link_info->grp_snd_id->asGroup());
-  agrpref_ptr->addChild(mesh_geode);
+  //  osg::Geode* mesh_geode = new osg::Geode();
+  std::string aStr(aGPIP.name);
+  graphics::LeafNodeMeshPtr_t leafNodeMesh = graphics::LeafNodeMesh::create(aStr);
 
-  osg::Geometry* mesh_geometry = new osg::Geometry();
-  mesh_geode->addDrawable(mesh_geometry);
-  
-  /* TO DO 
+  /*  ::osg::GroupRefPtr agrpref_ptr = 
+      osg::GroupRefPtr(aGPIP.an_olv_link_info->grp_snd_id->asGroup());
+  agrpref_ptr->addChild(leafNodeMesh);
+  */
+  aGPIP.an_olv_link_info->grp_snd_id->addChild(leafNodeMesh);
+
+  /* TO DO  */
   aGPIP.an_olv_link_info->list_of_shapes[aGPIP.id_in_list_of_shapes] = 
-    mesh_geode;
+    leafNodeMesh;
   aGPIP.an_olv_link_info->set_shape_transform_matrix(*aGPIP.a_trans_shape_id,
 						     aGPIP.id_in_list_of_shapes,
 						     false);
-  */
 
   osg::Vec3Array* mesh_vertices = new osg::Vec3Array;
 
@@ -330,10 +332,11 @@ void FromBodyToOsg::insert_mesh(GeometricPrimitiveInsertParameters &aGPIP)
 					 aGPIP.aShapeInfo->vertices[id_vertices+1],
 					 aGPIP.aShapeInfo->vertices[id_vertices+2]));
     }
-  mesh_geometry->setVertexArray( mesh_vertices ); 
+  leafNodeMesh->setVertexArray( mesh_vertices ); 
   
-  //if (m_Debug)
-    std::cout << "ShapeInfo nb of triangles:" << aGPIP.aShapeInfo->triangles.length()/3 << std::endl;
+  if (m_Debug)
+    std::cout << "ShapeInfo nb of triangles:" 
+	      << aGPIP.aShapeInfo->triangles.length()/3 << std::endl;
 
   // Insert triangles / creates the surface.
   for(unsigned int id_triangles=0;
@@ -346,57 +349,91 @@ void FromBodyToOsg::insert_mesh(GeometricPrimitiveInsertParameters &aGPIP)
       triangle_base->push_back(aGPIP.aShapeInfo->triangles[id_triangles]);
       triangle_base->push_back(aGPIP.aShapeInfo->triangles[id_triangles+1]);
       triangle_base->push_back(aGPIP.aShapeInfo->triangles[id_triangles+2]);
-      mesh_geometry->addPrimitiveSet(triangle_base); 
+      leafNodeMesh->addPrimitiveSet(triangle_base); 
     }
-
-  // Create Material and assign color.
-  osg::ref_ptr<osg::StateSet> nodess (agrpref_ptr->getOrCreateStateSet());
-
-  // Creating the material object
-  osg::ref_ptr<osg::Material> mat (new osg::Material);
   
   // Finding the material in the list.
   OLVMaterialInfo & aMaterialInfo = find_material(aGPIP);
-  aMaterialInfo.set_osg_material_info(mat);
+  //  aMaterialInfo.set_osg_material_info(mat);
 
   // Finding the appearance in the list.
   OLVAppearanceInfo & anAppearanceInfo = find_appearance(aGPIP);
 
-  //Attaching the newly defined state set object to the node state set
-  //mat->setColorMode(osg::Material::AMBIENT_AND_DIFFUSE);
-  mat->setColorMode(osg::Material::SPECULAR);
-  nodess->setAttribute(mat.get());
+  if (m_Debug)
+    {
+      std::cout << "AppearanceInfo nb of colors:" 
+		<< anAppearanceInfo.colors.size() << std::endl;
+      std::cout << "AppearanceInfo nb of colorIndices:" 
+		<< anAppearanceInfo.colorIndices.size() << std::endl;
+    }
 
   osg::Vec4Array* colors = new osg::Vec4Array;
-  colors->push_back(osg::Vec4(aMaterialInfo.diffuseColor[0],
-			      aMaterialInfo.diffuseColor[1],
-			      aMaterialInfo.diffuseColor[2],1.0f));
-  mesh_geometry->setColorArray(colors);
-  mesh_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-  
+  if (anAppearanceInfo.colorPerVertex && (anAppearanceInfo.colors.size()>0) )
+    {
+      for(unsigned int id_color=0;
+	  id_color < anAppearanceInfo.colorIndices.size();
+	  id_color++)
+	{
+	  unsigned int id_color_x = id_color * 4;
+	  osg::Vec4 a_color(anAppearanceInfo.colors[id_color_x],
+			    anAppearanceInfo.colors[id_color_x+1],
+			    anAppearanceInfo.colors[id_color_x+2],
+			    anAppearanceInfo.colors[id_color_x+3]);
+	  
+	  colors->push_back(a_color);
+	}
+    }
+  else
+    {
+      for(unsigned int id_color=0;
+	  id_color < aGPIP.aShapeInfo->vertices.length()/3;
+	  id_color++)
+	{
+	  osg::Vec4 a_color(aMaterialInfo.diffuseColor[0],
+			    aMaterialInfo.diffuseColor[1],
+			    aMaterialInfo.diffuseColor[2],
+			    aMaterialInfo.shininess);
+	  
+	  colors->push_back(a_color);
+	}
+    }
+  leafNodeMesh->setColorArray(colors);
+  leafNodeMesh->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+
   // Create normals
   osg::Vec3Array* normals = new osg::Vec3Array;
   if (m_Debug)
-    std::cout << "Normal indices:" << std::endl;
+    {
+      std::cout << "Normal indices:" << std::endl;
+      std::cout << "Normal Per Vertex: " <<
+	(int) anAppearanceInfo.normalPerVertex << std::endl;
+      std::cout << "Color Per Vertex: " <<
+	(int) anAppearanceInfo.colorPerVertex << std::endl;
+    }
   for(unsigned int id_normal_idx=0;
       id_normal_idx < anAppearanceInfo.normalIndices.size();
       id_normal_idx++)
     {
-      if (m_Debug)
-	std::cout << "id_normal_idx:" << id_normal_idx << std::endl;
       unsigned int id_normal = anAppearanceInfo.normalIndices[id_normal_idx]*3;
+
+      if (m_Debug)
+	std::cout << "id_normal_idx:" << id_normal_idx << " "
+		  << id_normal<< " " 
+		  << anAppearanceInfo.normals[id_normal] << " "
+		  << anAppearanceInfo.normals[id_normal+1] << " "
+		  << anAppearanceInfo.normals[id_normal+2] 
+		  << std::endl;
       normals->push_back(osg::Vec3(anAppearanceInfo.normals[id_normal],
 				   anAppearanceInfo.normals[id_normal+1],
 				   anAppearanceInfo.normals[id_normal+2]));
     }
   if (m_Debug)
     std::cout << std::endl;
-  mesh_geometry->setNormalArray(normals);
+  leafNodeMesh->setNormalArray(normals);
   if (anAppearanceInfo.normalPerVertex)
-    mesh_geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+    leafNodeMesh->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
   else
-    mesh_geometry->setNormalBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
-
+    leafNodeMesh->setNormalBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
   aGPIP.an_olv_link_info->grp_snd_id->setVisibilityMode(graphics::VISIBILITY_ON);  
 }
 

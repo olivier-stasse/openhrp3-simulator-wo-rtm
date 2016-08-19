@@ -59,6 +59,33 @@ void MainWindow::InitWindowManager()
   //-3.74331 6.67923 2.14167 -3.74331 6.67923 2.14167 0.108617 -0.205991 0.972507 0
 
   viewer_ptr.get()->getCameraManipulator()->setByMatrix(aViewMatrix);
+
+}
+osg::Node * createLights(osg::StateSet* rootStateSet)
+{
+
+  osg::Group* lightGroup = new osg::Group;
+  
+  // create a spot light.
+  osg::Light* myLight1 = new osg::Light;
+  myLight1->setLightNum(0);
+  myLight1->setPosition(osg::Vec4(3.0f,0.0f,4.0f,1.0f));
+  myLight1->setAmbient(osg::Vec4(0.8f,0.8f,0.8f,1.0f));
+  myLight1->setDiffuse(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
+  //myLight1->setSpotCutoff(50.0f);
+  //myLight1->setSpotExponent(100.0f);
+  myLight1->setConstantAttenuation(1.0f);
+  //myLight1->setSpecular(osg::Vec4(0.5f,0.5f,0.5f,0.5f));
+  myLight1->setDirection(osg::Vec3(-1.0f,0.0f,-1.0f));
+	
+  osg::LightSource* lightS1 = new osg::LightSource;
+  lightS1->setLight(myLight1);
+  lightS1->setLocalStateSetModes(osg::StateAttribute::ON);
+	
+  lightS1->setStateSetModes(*rootStateSet,osg::StateAttribute::ON);
+  lightGroup->addChild(lightS1);
+
+  return lightGroup;
 }
 
 int MainWindow::Init()
@@ -67,6 +94,10 @@ int MainWindow::Init()
   
   // Add axis to the drawing.
   createAxis(world_);
+  osg::StateSet* rootStateSet = new osg::StateSet;
+  
+  world_->getOsgNode()->setStateSet(rootStateSet);
+  world_->asGroup()->addChild(createLights(rootStateSet));
 
   InitWindowManager();
 

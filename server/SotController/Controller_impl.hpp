@@ -251,3 +251,9 @@ void Controller_impl<T>::set_path_to_library(std::string & path_to_library)
 {
   RobotController_.set_path_to_library(path_to_library);
 }
+
+template <class T>
+void Controller_impl<T>::set_path_to_pid_gains(std::string & path_to_pid_gains)
+{
+  RobotController_.set_path_to_pid_gains(path_to_pid_gains);
+}

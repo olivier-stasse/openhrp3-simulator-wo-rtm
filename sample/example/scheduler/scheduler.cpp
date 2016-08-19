@@ -43,7 +43,7 @@ X_ptr checkCorbaServer(std::string n, CosNaming::NamingContext_var &cxt)
 
 int main(int argc, char* argv[]) 
 {
-	double timeStep = 0.0002;  // (s)
+	double timeStep = 0.001;  // (s)
 	double controlTimeStep = 0.001;
 	double EndTime = 2000.0;
 
@@ -224,6 +224,7 @@ int main(int argc, char* argv[])
 			
 
 		}
+	
 	dynamicsSimulator->setCharacterAllLinkData( body->name(), DynamicsSimulator::JOINT_VALUE, angle );
 	dynamicsSimulator->calcWorldForwardKinematics();
 
@@ -267,7 +268,7 @@ int main(int argc, char* argv[])
 																				ExtraJointType::EJ_XYZ,
 																				aJointAxis,
 																				"RL6RL1");
-	aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = -0.004; 	aLink1LocalPos[2] = -0.11;
+	aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = 0.004; 	aLink1LocalPos[2] = -0.11;
 	aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
 	dynamicsSimulator->registerExtraJoint(body->name(), "LARM_JOINT5",
 																				body->name(), "LHAND_JOINT4",
@@ -276,6 +277,7 @@ int main(int argc, char* argv[])
 																				aJointAxis,
 																				"RH2RL4");
 
+	dynamicsSimulator->setCharacterAllJointModes( body->name(), DynamicsSimulator::HIGH_GAIN_MODE);
 	dynamicsSimulator->initSimulation();
         
 	// ==================  Controller setup ==========================
@@ -359,13 +361,14 @@ int main(int argc, char* argv[])
 		//		dynamicsSimulator->getCharacterLinkData(body->name(), "RARM_LINK6", DynamicsSimulator::ABS_VELOCITY,  waist_vw);
 
 		// ================== log data save =====================
+		/*
 		log_file << time << " ";
 		log_file << waist_pR[0] << " " << waist_pR[1] << " " << waist_pR[2] << " " << " "
 						 << lleg_joint5[0] << " " << lleg_joint5[1] << " " << lleg_joint5[2]  <<  " " 
 						 << rarm_joint5[0] << " " << rarm_joint5[1] << " " << rarm_joint5[2]  <<  " " 
 						 << rhand_joint1[0] << " " << rhand_joint1[1] << " " << rhand_joint1[2] ;
 		log_file << endl;
-
+		*/
 		if(control)
 			{
 				if(controller_found)
@@ -373,7 +376,7 @@ int main(int argc, char* argv[])
 			}
 
 		if( time > EndTime ) break;
-		usleep(5000);
+		//usleep(1000);
 		//std::cout << "time: " << time << std::endl;
 			
 	}
