@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 2.6)
 include(cmake/base.cmake)
 include(cmake/pthread.cmake)
 
-set(PROJECT_NAME OpenHRP-Simulator)
+set(PROJECT_NAME openhrp3-simulator-wo-rtm)
 set(PROJECT_DESCRIPTION "OpenHRP simulator")
-set(PROJECT_URL "http://github.com/fkanehiro/openhrp3")
+set(PROJECT_URL "http://github.com/olivier-stasse/openhrp3-simulator-wo-rtm")
 
 # Disable -Werror on Unix for now.
 set(CXX_DISABLE_WERROR True)

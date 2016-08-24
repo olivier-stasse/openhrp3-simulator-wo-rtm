@@ -83,3 +83,5 @@ hrplib_install_macro(${target} ${HRPCOLLISION_VERSION})
 install(FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/hrpCollision)
 
 ADD_SUBDIRECTORY(Opcode)
+
+PKG_CONFIG_APPEND_LIBS("hrpCollision-${OPENHRP_LIBRARY_VERSION}")

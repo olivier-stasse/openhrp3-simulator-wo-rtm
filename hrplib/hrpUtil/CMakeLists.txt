@@ -82,3 +82,5 @@ if(BUILD_GOOGLE_TEST)
   set_target_properties(testEigen3d PROPERTIES COMPILE_FLAGS "-g -O0 -coverage" LINK_FLAGS "-g -O0 -coverage")
   add_test(testEigen3d ${EXECUTABLE_OUTPUT_PATH}/testEigen3d)
 endif()
+
+PKG_CONFIG_APPEND_LIBS("hrpUtil-${OPENHRP_LIBRARY_VERSION}")

@@ -393,14 +393,6 @@ int main(int argc, char* argv[])
 		//		dynamicsSimulator->getCharacterLinkData(body->name(), "RARM_LINK6", DynamicsSimulator::ABS_VELOCITY,  waist_vw);
 
 		// ================== log data save =====================
-		/*
-		log_file << time << " ";
-		log_file << waist_pR[0] << " " << waist_pR[1] << " " << waist_pR[2] << " " << " "
-						 << lleg_joint5[0] << " " << lleg_joint5[1] << " " << lleg_joint5[2]  <<  " " 
-						 << rarm_joint5[0] << " " << rarm_joint5[1] << " " << rarm_joint5[2]  <<  " " 
-						 << rhand_joint1[0] << " " << rhand_joint1[1] << " " << rhand_joint1[2] ;
-		log_file << endl;
-		*/
 		if(control)
 			{
 				if(controller_found)
@@ -408,8 +400,6 @@ int main(int argc, char* argv[])
 			}
 
 		if( time > EndTime ) break;
-		//usleep(1000);
-		//std::cout << "time: " << time << std::endl;
 			
 	}
 

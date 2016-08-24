@@ -75,3 +75,6 @@ set(module_py_files ${CMAKE_CURRENT_BINARY_DIR}/OpenHRP/__init__.py)
 install(FILES ${module_py_files} DESTINATION lib/python${python_version}/dist-packages/OpenHRP)
 set(module_poa_py_files ${CMAKE_CURRENT_BINARY_DIR}/OpenHRP__POA/__init__.py)
 install(FILES ${module_poa_py_files} DESTINATION lib/python${python_version}/dist-packages/OpenHRP__POA)
+
+PKG_CONFIG_APPEND_LIBS("hrpCorbaStubSkel-${OPENHRP_LIBRARY_VERSION}")
+PKG_CONFIG_APPEND_LIBS("${OMNIORB_LIBRARIES}")

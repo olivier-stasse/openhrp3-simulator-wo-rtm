@@ -155,30 +155,6 @@ getJointDataSeqRef(DynamicsSimulator::LinkDataType linkDataType)
   return outputJointValueSeqInfos[linkDataType].values;
 }
 
-// template <class T>
-// void Controller_impl<T>::
-// flushJointDataSeqToSimulator(DynamicsSimulator::LinkDataType linkDataType)
-// {
-//   JointValueSeqInfoMap::iterator p = outputJointValueSeqInfos.find(linkDataType);
-//   if(p != outputJointValueSeqInfos.end()){
-//     JointValueSeqInfo& info = p->second;
-//     if(!info.flushed){
-//       dynamicsSimulator->setCharacterAllLinkData(modelName.c_str(), linkDataType, info.values);
-//       info.flushed = true;
-//     }
-//   }
-// }
-
-// template <class T>
-// void Controller_impl<T>::
-// flushLinkDataToSimulator(const std::string& linkName,
-// 			 DynamicsSimulator::LinkDataType linkDataType,
-// 			 const DblSequence& linkData)
-// {
-//   dynamicsSimulator->setCharacterLinkData(modelName.c_str(), linkName.c_str(),
-// 					  linkDataType, linkData);
-// }
-
 template <class T>
 void Controller_impl<T>::output()
 {
