@@ -667,7 +667,7 @@ bool Body::installCustomizer()
         loadBodyCustomizers(bodyInterface());
         pluginsInDefaultDirectoriesLoaded = true;
     }
-		
+
     BodyCustomizerInterface* interface = findBodyCustomizer(modelName_);
 
     return interface ? installCustomizer(interface) : false;

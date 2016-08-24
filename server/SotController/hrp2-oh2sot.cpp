@@ -64,6 +64,15 @@ HRP2OH2SOT::HRP2OH2SOT()
 
   std::ofstream LogFile;
   LogFile.open("/tmp/angle.dat",std::ofstream::out);
+  LogFile << "%time ";
+  for(unsigned int i=0;i<nb_dofs_;i++)
+    LogFile << " Q"<<i << " ";
+
+  for(unsigned int i=0;i<4;i++)
+    for(unsigned int j=0;j<6;j++)
+      LogFile << " F"<< i << "_" << j;
+
+  LogFile << std::endl;
   LogFile.close();
 }
 
@@ -301,9 +310,18 @@ void HRP2OH2SOT::input()
       dq_[i] = var_dq[0];
 
     }
+  fillSensors(sensorsIn_);
+  for(unsigned int i=0;i<4;i++)
+    {
+      for(unsigned int j=0;j<6;j++)
+	{
+	  LogFile << forces_[i*6+j] << " ";
+	}
+    }
+     
   LogFile << std::endl;
   LogFile.close();
-  fillSensors(sensorsIn_);
+
 }
 
 void HRP2OH2SOT::output()

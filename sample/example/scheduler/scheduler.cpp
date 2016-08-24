@@ -224,8 +224,40 @@ int main(int argc, char* argv[])
 			
 
 		}
-	
+
 	dynamicsSimulator->setCharacterAllLinkData( body->name(), DynamicsSimulator::JOINT_VALUE, angle );
+
+	dynamicsSimulator->setCharacterAllJointModes( body->name(), DynamicsSimulator::HIGH_GAIN_MODE);
+	DblSequence wdata;
+	wdata.length(1);
+	wdata[0] = -1.0;
+	// The bush fill are torque controlled.
+	dynamicsSimulator->setCharacterLinkData( body->name(), 
+																					 "RLEG_BUSH_Z", 
+																					 DynamicsSimulator::POSITION_GIVEN, 
+																					 wdata );
+	dynamicsSimulator->setCharacterLinkData( body->name(), 
+																					 "RLEG_BUSH_ROLL", 
+																					 DynamicsSimulator::POSITION_GIVEN, 
+																					 wdata );
+	dynamicsSimulator->setCharacterLinkData( body->name(), 
+																					 "RLEG_BUSH_PITCH", 
+																					 DynamicsSimulator::POSITION_GIVEN, 
+																					 wdata );
+	
+	dynamicsSimulator->setCharacterLinkData( body->name(), 
+																					 "LLEG_BUSH_Z", 
+																					 DynamicsSimulator::POSITION_GIVEN, 
+																					 wdata );
+	dynamicsSimulator->setCharacterLinkData( body->name(), 
+																					 "LLEG_BUSH_ROLL", 
+																					 DynamicsSimulator::POSITION_GIVEN, 
+																					 wdata );
+	dynamicsSimulator->setCharacterLinkData( body->name(), 
+																					 "LLEG_BUSH_PITCH", 
+																					 DynamicsSimulator::POSITION_GIVEN, 
+																					 wdata );
+	
 	dynamicsSimulator->calcWorldForwardKinematics();
 
 	DblSequence6 K, C;    // spring-damper parameters are not used now
@@ -277,7 +309,7 @@ int main(int argc, char* argv[])
 																				aJointAxis,
 																				"RH2RL4");
 
-	dynamicsSimulator->setCharacterAllJointModes( body->name(), DynamicsSimulator::HIGH_GAIN_MODE);
+
 	dynamicsSimulator->initSimulation();
         
 	// ==================  Controller setup ==========================
