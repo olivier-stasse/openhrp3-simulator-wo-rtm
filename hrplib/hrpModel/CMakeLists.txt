@@ -1,5 +1,5 @@
 
-configure_file(Config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/Config.h)
+configure_file(Config.h.in ${CMAKE_BINARY_DIR}/hrplib/hrpModel/Config.h)
 
 set(sources
   Sensor.cpp
@@ -40,7 +40,7 @@ set(headers
   Sensor.h
   Light.h
   World.h
-  Config.h
+  ${CMAKE_BINARY_DIR}/hrplib/hrpModel/Config.h
   )	
 
 
