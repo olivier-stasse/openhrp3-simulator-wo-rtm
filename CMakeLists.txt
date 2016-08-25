@@ -98,7 +98,7 @@ endif()
 include_directories(${PROJECT_BINARY_DIR}/hrplib)
 include_directories(${PROJECT_SOURCE_DIR}/hrplib)
 
-set(OPENHRP_SIMULATOR_IDL_DIR ${OpenHRP-Simulator_SOURCE_DIR}/idl)
+set(OPENHRP_SIMULATOR_IDL_DIR ${CMAKE_SOURCE_DIR}/idl)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
