@@ -1,0 +1,8 @@
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-model-loader &> /tmp/openhrp-model-loader.log &
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-collision-detector &> /tmp/openhrp-collision-detector.log &
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-aist-dynamics-simulator &> /tmp/openhrp-aist-dynamics.log &
+@CMAKE_INSTALL_PREFIX@/bin/gepetto-online-viewer &> /tmp/gepetto-viewer.log &
+@CMAKE_INSTALL_PREFIX@/bin/controller-sample &> /tmp/controller-sample.log &
+/bin/sleep 1
+@CMAKE_INSTALL_PREFIX@/example/@PROJECT_NAME@/scheduler/schedulerproject -url @CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/project/SpringJoint.xml
+

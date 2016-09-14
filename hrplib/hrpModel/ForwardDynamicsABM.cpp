@@ -485,8 +485,15 @@ void ForwardDynamicsABM::updateForceSensor(ForceSensor* sensor)
 
 	//    | f   | = | Ivv  trans(Iwv) | * | dvo | + | pf   |
 	//    | tau |   | Iwv     Iww     |   | dw  |   | ptau |
-	
+	   
 	Vector3 f  (-(link->Ivv * link->dvo + link->Iwv.transpose() * link->dw + link->pf));
+	if (link->name=="RLEG_BUSH_Z")
+	  {
+	    std::cout << "ABM - RLEG_BUSH_Z: " 
+		      << f
+		      << std::endl;
+	  }
+
 	Vector3 tau(-(link->Iwv * link->dvo + link->Iww * link->dw + link->ptau));
 
 	Matrix33 sensorR(link->R * sensor->localR);

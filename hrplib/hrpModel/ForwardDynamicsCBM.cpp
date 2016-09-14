@@ -96,7 +96,7 @@ void ForwardDynamicsMM::initialize()
 	M12.resize(n, given_rootDof+m);
 	b1. resize(n, 1);
 	c1. resize(n);
-    d1. resize(n, 1);
+	d1. resize(n, 1);
 
 	qGiven.  resize(m);
 	dqGiven. resize(m);
@@ -148,6 +148,7 @@ inline void ForwardDynamicsMM::calcAccelFKandForceSensorValues()
 
 void ForwardDynamicsMM::calcNextState()
 {
+
 	if(isNoUnknownAccelMode && !body->numSensors(Sensor::FORCE)){
 
 		calcPositionAndVelocityFK();
@@ -703,10 +704,9 @@ void ForwardDynamicsMM::solveUnknownAccels(const Vector3& fext, const Vector3& t
 	for(size_t i=0; i < torqueModeJoints.size(); ++i){
 		c1(i + unknown_rootDof) = torqueModeJoints[i]->u;
 	}
-
         c1 -= d1;
 	c1 -= b1.col(0);
-
+	
         dvector a(M11.colPivHouseholderQr().solve(c1));
 
 	if(unknown_rootDof){
@@ -727,20 +727,22 @@ void ForwardDynamicsMM::calcAccelFKandForceSensorValues(Link* link, Vector3& out
 {
     Link* parent = link->parent;
 
-    if(parent){
-		link->dvo = parent->dvo + link->cv + link->sv * link->ddq;
-		link->dw  = parent->dw  + link->cw + link->sw * link->ddq;
-    }
-
+    if(parent)
+      {
+	link->dvo = parent->dvo + link->cv + link->sv * link->ddq;
+	link->dw  = parent->dw  + link->cw + link->sw * link->ddq;
+      }
+        
     out_f   = link->pf;
     out_tau = link->ptau;
-
+        
 	for(Link* child = link->child; child; child = child->sibling){
 		Vector3 f, tau;
 		calcAccelFKandForceSensorValues(child, f, tau);
 		out_f   += f;
 		out_tau += tau;
-    }
+	
+	}
 
 	ForceSensorInfo& info = forceSensorInfo[link->index];
 
@@ -810,3 +812,4 @@ void ForwardDynamicsMM::updateForceSensorInfo(Link* link, bool hasSensorsAbove)
 		updateForceSensorInfo(child, hasSensorsAbove);
     }
 }
+
