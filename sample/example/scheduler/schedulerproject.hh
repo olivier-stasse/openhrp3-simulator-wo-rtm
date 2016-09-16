@@ -54,17 +54,21 @@ protected:
 
   //@{ set joint data methods
   void setBodyMode(JointData &aJointData,
-		   OpenHRP::BodyInfo_var  aBodyInfo,
+		   //OpenHRP::BodyInfo_var  aBodyInfo,
+		   std::string &CharacterName,
 		   CORBA::String_var CORBAbodyName);
 
   void setBodyVelocity(JointData &aJointData,
-		       OpenHRP::BodyInfo_var  aBodyInfo,
+		       //OpenHRP::BodyInfo_var  aBodyInfo,
+		       std::string &CharacterName,
 		       CORBA::String_var CORBAbodyName);
   void setBodyAngle(JointData &aJointData,
-		    OpenHRP::BodyInfo_var  aBodyInfo,
+		    //OpenHRP::BodyInfo_var  aBodyInfo,
+		    std::string &CharacterName,
 		    CORBA::String_var CORBAbodyName);
   void setBodyAbsolutePosition(JointData &aJointData,
-			       OpenHRP::BodyInfo_var  aBodyInfo,
+			       //OpenHRP::BodyInfo_var  aBodyInfo,
+			       std::string &CharacterName,
 			       CORBA::String_var CORBAbodyName);
   
 

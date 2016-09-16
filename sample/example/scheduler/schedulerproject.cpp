@@ -144,7 +144,7 @@ void SchedulerProject::loadModels(int argc,char * argv[])
      {
        for(unsigned int i=0;i<aListOfModelItems_.get()->size();i++)
 	 {
-	   olv_->load((*aListOfModelItems_.get())[i].bodyInfoVar->name(),
+	   olv_->load((*aListOfModelItems_.get())[i].name.c_str(),
 		      (*aListOfModelItems_.get())[i].url.c_str());
 	 }
 
@@ -159,33 +159,35 @@ void SchedulerProject::loadModels(int argc,char * argv[])
 
 
  void SchedulerProject::setBodyAngle(JointData &aJointData,
-				     OpenHRP::BodyInfo_var  aBodyInfo,
+				     //OpenHRP::BodyInfo_var  aBodyInfo,
+				     std::string &CharacterName,
 				     CORBA::String_var CORBAbodyName)
  {
    // Set angle value.
    DblSequence corba_angle;
    corba_angle.length(1);
    corba_angle[0] = aJointData.angle;
-   dynamicsSimulator_->setCharacterLinkData( aBodyInfo->name(), 
+   ODEBUG(std::cout << "setBodyAngle: " << CharacterName << " " << CORBAbodyName << " " << aJointData.angle<<std::endl);
+   dynamicsSimulator_->setCharacterLinkData( CharacterName.c_str(),
 					     CORBAbodyName,
 					     DynamicsSimulator::JOINT_VALUE, 
 					     corba_angle );
- }
+  }
 
- void SchedulerProject::setBodyVelocity(JointData &aJointData,
-					OpenHRP::BodyInfo_var  aBodyInfo,
-					CORBA::String_var CORBAbodyName)
- {
+  void SchedulerProject::setBodyVelocity(JointData &aJointData,
+					 string & CharacterName,
+					 CORBA::String_var CORBAbodyName)
+  {
 
-   if ((aJointData.velocity.size()>0) && 
-       (aJointData.angularVelocity.size()>0))
-     {
-       DblSequence   velocity; velocity.length(6);
-       for(unsigned int idVel=0;idVel<3;idVel++)
-	 { velocity[idVel] = aJointData.velocity[idVel];
-	   velocity[idVel+3] = aJointData.angularVelocity[idVel];
-	 }
-       dynamicsSimulator_->setCharacterLinkData( aBodyInfo->name(), 
+    if ((aJointData.velocity.size()>0) && 
+	(aJointData.angularVelocity.size()>0))
+      {
+	DblSequence   velocity; velocity.length(6);
+	for(unsigned int idVel=0;idVel<3;idVel++)
+	  { velocity[idVel] = aJointData.velocity[idVel];
+	    velocity[idVel+3] = aJointData.angularVelocity[idVel];
+	  }
+	dynamicsSimulator_->setCharacterLinkData(CharacterName.c_str(),
 						 CORBAbodyName,
 						 DynamicsSimulator::ABS_VELOCITY, 
 						 velocity );
@@ -248,11 +250,11 @@ void SchedulerProject::loadModels(int argc,char * argv[])
  };
 
 void SchedulerProject::setBodyAbsolutePosition(JointData &aJointData,
-					       OpenHRP::BodyInfo_var  aBodyInfo,
+					       string &CharacterName,
 					       CORBA::String_var CORBAbodyName)
 {
   ODEBUG3(std::cout << "Going through setBodyAbsolute Position for :" 
-	  << aBodyInfo->name() << " " 
+	  << CharacterName << " " 
 	  << CORBAbodyName << " " 
 	  << aJointData.translation.size() << " "
 	  << aJointData.rotation.size()
@@ -260,8 +262,8 @@ void SchedulerProject::setBodyAbsolutePosition(JointData &aJointData,
   if ((aJointData.translation.size()>0) && 
       (aJointData.rotation.size()>0))
     {
-      ODEBUG3(std::cout << "initialize absolute position of :"
-	     << aBodyInfo->name() << " link: " << CORBAbodyName << std::endl);
+      ODEBUG(std::cout << "initialize absolute position of :"
+	     << CharacterName << " link: " << CORBAbodyName << std::endl);
 	     
       DblSequence TransformArray; TransformArray.length(12);
       for(unsigned int i=0;i<3;i++)
@@ -277,7 +279,7 @@ void SchedulerProject::setBodyAbsolutePosition(JointData &aJointData,
       TransformArray[3] = aRotation.m00;TransformArray[4]  = aRotation.m01;TransformArray[5]  = aRotation.m02;
       TransformArray[6] = aRotation.m10;TransformArray[7]  = aRotation.m11;TransformArray[8]  = aRotation.m12;
       TransformArray[9] = aRotation.m20;TransformArray[10] = aRotation.m21;TransformArray[11] = aRotation.m22;
-      dynamicsSimulator_->setCharacterLinkData( aBodyInfo->name(), 
+      dynamicsSimulator_->setCharacterLinkData(	CharacterName.c_str(),
 						CORBAbodyName,
 						DynamicsSimulator::ABS_TRANSFORM, 
 						TransformArray );
@@ -293,16 +295,17 @@ void SchedulerProject::setBodyAbsolutePosition(JointData &aJointData,
 }
 
 void SchedulerProject::setBodyMode(JointData &aJointData,
-				    OpenHRP::BodyInfo_var  aBodyInfo,
+				   //OpenHRP::BodyInfo_var  aBodyInfo,
+				   string &CharacterName,
 				    CORBA::String_var CORBAbodyName)
 {
   DblSequence wdata;
   wdata.length(1);
-  ODEBUG(std::cout << "In " << aBodyInfo->name() << "setBodyMode for " << CORBAbodyName);
+  ODEBUG(std::cout << "In " << CharacterName << "setBodyMode for " << CORBAbodyName);
   if (aJointData.mode==0)
     {
-      wdata[0] = 0.0;
-      dynamicsSimulator_->setCharacterLinkData( aBodyInfo->name(), 
+      wdata[0] = 1.0;
+      dynamicsSimulator_->setCharacterLinkData(	CharacterName.c_str(),
 						CORBAbodyName, 
 						DynamicsSimulator::POSITION_GIVEN, 
 						wdata ); 
@@ -311,7 +314,7 @@ void SchedulerProject::setBodyMode(JointData &aJointData,
   else 
     {
       wdata[0] = -1.0;
-      dynamicsSimulator_->setCharacterLinkData( aBodyInfo->name(), 
+      dynamicsSimulator_->setCharacterLinkData(	CharacterName.c_str(),
 						CORBAbodyName, 
 						DynamicsSimulator::POSITION_GIVEN, 
 						wdata ); 
@@ -324,6 +327,7 @@ void SchedulerProject::initRobotsJointData()
 {
   if (simulationData_.get()->integrate)
     {
+      
       // Iterate over the robots.
       for(unsigned int idModel=0;
 	  idModel < aListOfModelItems_.get()->size();
@@ -332,7 +336,8 @@ void SchedulerProject::initRobotsJointData()
 	  OpenHRP::BodyInfo_var aBodyInfo = 
 	    (*aListOfModelItems_.get())[idModel].bodyInfoVar;
 	  LinkInfoSequence_var aLinkInfoSequence = aBodyInfo->links();
-	 
+
+
 	  // Iterave over the links
 	  for(unsigned int idLinks=0;
 	      idLinks<aLinkInfoSequence->length();
@@ -344,10 +349,11 @@ void SchedulerProject::initRobotsJointData()
 	      
 	      JointData aJointData = 
 		(*aListOfModelItems_.get())[idModel].jointsMap[bodyName];
-	      setBodyAbsolutePosition(aJointData,aBodyInfo,CORBAbodyName);  // Set Body absoluteposition.
-	      setBodyAngle(aJointData,aBodyInfo,CORBAbodyName);     // Set Body angle value.
-	      setBodyVelocity(aJointData,aBodyInfo,CORBAbodyName);  // Set Joint speed.
-	      setBodyMode(aJointData,aBodyInfo,CORBAbodyName);  // Set Joint mode.
+	      std::string & CharacterName = (*aListOfModelItems_.get())[idModel].name;
+	      setBodyAbsolutePosition(aJointData,CharacterName,CORBAbodyName);  // Set Body absoluteposition.
+	      setBodyAngle(aJointData,CharacterName,CORBAbodyName);     // Set Body angle value.
+	      setBodyVelocity(aJointData,CharacterName,CORBAbodyName);  // Set Joint speed.
+	      setBodyMode(aJointData,CharacterName,CORBAbodyName);  // Set Joint mode.
 	    }
 	}
     }
@@ -356,7 +362,65 @@ void SchedulerProject::initRobotsJointData()
 
 void SchedulerProject::initParallelMecanisms()
 {
-  // TO DO EXTRACT EXTRA JOINTS
+  ODEBUG(std::cout << "initParallelMecanisms start" << std::endl;)
+  // Iterate over the robots.
+  for(unsigned int idModel=0;
+      idModel < aListOfModelItems_.get()->size();
+      idModel++)
+    {
+      OpenHRP::BodyInfo_var aBodyInfo = 
+	(*aListOfModelItems_.get())[idModel].bodyInfoVar;
+      ODEBUG(std::cout << aBodyInfo->name() << std::endl);
+
+      if (!strcmp(aBodyInfo->name(),"HRP2JRL"))
+	{
+	  ODEBUG(std::cout << "Enter in Extra joints for HRP2JRL" << std::endl);
+	  // TO DO EXTRACT EXTRA JOINTS
+	  DblSequence3 aLink1LocalPos,aLink2LocalPos;
+	  aLink1LocalPos.length(3); aLink2LocalPos.length(3);
+	  aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = 0.004; 	aLink1LocalPos[2] = -0.11;
+	  aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
+	  DblSequence3 aJointAxis;
+	  aJointAxis.length(3);
+	  aJointAxis[0] = 1.0; aJointAxis[1] = 0.0; aJointAxis[2] = 0.0;
+	  
+	  // Close the kinematic chain of the Right hand - gripper
+	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), "RARM_JOINT5",
+						 aBodyInfo->name(), "RHAND_JOINT1",
+						 aLink1LocalPos, aLink2LocalPos,
+						 ExtraJointType::EJ_XYZ,
+						 aJointAxis,
+						 "RL6RL1");
+	  
+	  aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = -0.004; 	aLink1LocalPos[2] = -0.115;
+	  aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
+	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), "RARM_JOINT5",
+						 aBodyInfo->name(), "RHAND_JOINT4",
+						 aLink1LocalPos, aLink2LocalPos,
+						 ExtraJointType::EJ_XYZ,
+						 aJointAxis,
+						 "RH2RL4");
+	  
+	  // Close the kinematic chain of the Left hand - gripper
+	  aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = -0.004; 	aLink1LocalPos[2] = -0.11;
+	  aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
+	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), "LARM_JOINT5",
+						 aBodyInfo->name(), "LHAND_JOINT1",
+						 aLink1LocalPos, aLink2LocalPos,
+						 ExtraJointType::EJ_XYZ,
+						 aJointAxis,
+						 "RL6RL1");
+	  aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = 0.004; 	aLink1LocalPos[2] = -0.11;
+	  aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
+	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), "LARM_JOINT5",
+						 aBodyInfo->name(), "LHAND_JOINT4",
+						 aLink1LocalPos, aLink2LocalPos,
+						 ExtraJointType::EJ_XYZ,
+						 aJointAxis,
+						 "RH2RL4");
+	}
+    }
+  ODEBUG(std::cout << "initParallelMecanisms end" << std::endl;)
 }
 
 void SchedulerProject::initCollisions()
@@ -439,8 +503,9 @@ void SchedulerProject::initDynamicsSimulator()
     {
       OpenHRP::BodyInfo_var aBodyInfo = (*aListOfModelItems_.get())[i].bodyInfoVar;
       
-      cout << "Character  : |" << aBodyInfo->name() << "|" << std::endl;
-      dynamicsSimulator_->registerCharacter(aBodyInfo->name(), 
+      cout << "Character  : |" << (*aListOfModelItems_.get())[i].name << "|" << std::endl
+	   << "Model      : |" << aBodyInfo->name() << "|" << std::endl;
+      dynamicsSimulator_->registerCharacter((*aListOfModelItems_.get())[i].name.c_str(), 
 					    aBodyInfo);			    
     }
 
@@ -472,13 +537,15 @@ void SchedulerProject::initController()
 {
   // Allocate the number of possible controllers.
   aListOfControllers_.resize(aListOfModelItems_.get()->size());
-
+  ODEBUG(std::cout << "initController() start" << std::endl);
   for(unsigned int i=0;i<aListOfModelItems_.get()->size();i++)
     {
       
       std::string &lControllerName =  (*aListOfModelItems_.get())[i].controllerName;
       bool lcontrollerOpenHRP;
-      
+
+      ODEBUG(std::cout << (*aListOfModelItems_.get())[i].name << " " 
+	     << (*aListOfModelItems_.get())[i].controllerName<< std::endl );
       // If no controller is specified
       if (lControllerName.length()==0)
 	{
@@ -499,7 +566,9 @@ void SchedulerProject::initController()
 	  cerr << "Failed to connect to " << lControllerName.c_str() << endl;
 	  aListOfControllers_[i].controller_found = false;
 	}
-      
+      ODEBUG(std::cout << "initController() connected to " 
+	     << lControllerName.c_str() 
+	     << std::endl);
       if (CORBA::is_nil(aListOfControllers_[i].controller)) {
 	std::cerr << "Controller " << lControllerName << " not found" << std::endl;
 	aListOfControllers_[i].controller_found = false;
@@ -521,7 +590,7 @@ void SchedulerProject::initController()
 	  aListOfControllers_[i].controller->start();
 	}
     }
-
+  ODEBUG(std::cout << "initController() end" << std::endl);
 }
 
 void SchedulerProject::init(int argc,char * argv[])
@@ -621,7 +690,8 @@ void SchedulerProject::mainLoop()
     saveLog(time);
 
     if( time > simulationData_.get()->totalTime ) break;
-    
+
+    //usleep(5000);
   }
 
   //controller->stop();
@@ -641,29 +711,30 @@ void SchedulerProject::saveLog(double ltime)
       OpenHRP::BodyInfo_var aBodyInfo = 
 	(*aListOfModelItems_.get())[idModel].bodyInfoVar;
       
-      dynamicsSimulator_->getCharacterSensorState(aBodyInfo->name(), 
-						 sstate);
+      std::string & CharacterName = (*aListOfModelItems_.get())[idModel].name;
+      dynamicsSimulator_->getCharacterSensorState(CharacterName.c_str(), 
+						  sstate);
       for(unsigned int aLinkDataType=(unsigned int)
 	    DynamicsSimulator::JOINT_VALUE;
-	  aLinkDataType<=(unsigned int)DynamicsSimulator::JOINT_TORQUE;
+	  aLinkDataType<=(unsigned int)DynamicsSimulator::ABS_ACCELERATION;
 	  aLinkDataType++)
 	{
+	  int lid = aLinkDataType-DynamicsSimulator::JOINT_VALUE;
 	  unsigned int sizeofdata[7] = {1,1,1,1,12,6,6};
 	  LinkInfoSequence_var aLinkInfo = aBodyInfo->links();
 	  std::vector<double>  & avec_data=
-	    listOfLogs_[idModel].jointData[aLinkDataType-
-					   DynamicsSimulator::JOINT_VALUE];
-	  avec_data.resize(aLinkInfo->length()*sizeofdata[aLinkDataType]);
+	    listOfLogs_[idModel].jointData[lid];
+	  avec_data.resize(aLinkInfo->length()*sizeofdata[lid]);
 
 	  for(unsigned int idLink=0;idLink<aLinkInfo->length();idLink++)
 	    {
 	      DblSequence_var wdata;
-	      dynamicsSimulator_->getCharacterLinkData(aBodyInfo->name(),
+	      dynamicsSimulator_->getCharacterLinkData(CharacterName.c_str(),
 						       aLinkInfo[idLink].name,
 						       (DynamicsSimulator::LinkDataType)aLinkDataType,
 						       wdata);
 	      for(unsigned int i=0;i<wdata->length();i++)
-		avec_data[sizeofdata[aLinkDataType]*idLink+i] = wdata[i];
+		avec_data[sizeofdata[lid]*idLink+i] = wdata[i];
 	    }
 	}
       listOfLogs_[idModel].saveLog(ltime,sstate);

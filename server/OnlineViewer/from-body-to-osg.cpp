@@ -696,10 +696,11 @@ void FromBodyToOsg::load(GroupNodePtr_t & world,
 
   // Display the result
   //  if (m_Debug)
-    display_body(aBodyInfo);
+  display_body(aBodyInfo);
 
   // Create object
-  std::string obj_name = aBodyInfo->name();
+  //  std::string obj_name = aBodyInfo->name();
+  std::string obj_name(name);
   new_osg_obj= graphics::GroupNode::create(obj_name);
 
   // Update map of bodys.

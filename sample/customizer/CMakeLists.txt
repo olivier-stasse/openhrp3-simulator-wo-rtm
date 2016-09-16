@@ -11,3 +11,5 @@ compile_customizer(BUSHCustomizer bush_customizer.cpp)
 set(libnames BUSHCustomizer)
 
 install(TARGETS ${libnames} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/customizer CONFIGURATIONS Release Debug RelWithDebInfo)
+
+install(FILES springJoint_param.conf sample1_bush_customizer_param.conf DESTINATION ${CMAKE_INSTALL_PREFIX}/share/customizer CONFIGURATIONS Release Debug RelWithDebInfo)

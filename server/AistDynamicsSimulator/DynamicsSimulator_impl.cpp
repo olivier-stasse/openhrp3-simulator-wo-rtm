@@ -599,7 +599,7 @@ void DynamicsSimulator_impl::stepSimulation()
   }
 
   if(debugMode){
-    cout << "DynamicsSimulator_impl::stepSimulation()" << endl;
+    cout << "DynamicsSimulator_impl::stepSimulation() toto " << endl;
   }
 
   if(enableTimeMeasure) timeMeasure2.begin();
@@ -837,6 +837,16 @@ void DynamicsSimulator_impl::getCharacterLinkData
     rdata[5] = link->w(2);
     break;
 
+  case OpenHRP::DynamicsSimulator::ABS_ACCELERATION:
+    rdata->length(6);
+    rdata[0] = link->dvo(0);
+    rdata[1] = link->dvo(1);
+    rdata[2] = link->dvo(2);
+    rdata[3] = link->dw(0);
+    rdata[4] = link->dw(1);
+    rdata[5] = link->dw(2);
+    break;
+
   case OpenHRP::DynamicsSimulator::EXTERNAL_FORCE:
     rdata->length(6);
     rdata[0] = link->fext(0);
@@ -867,6 +877,9 @@ void DynamicsSimulator_impl::getCharacterLinkData
   }
   if (debugMode)
     {
+      for(unsigned int i=0;i<rdata->length();i++)
+	cout << rdata[i] << " ";
+      cout << std::endl;
       cout << "rdata.length():" << rdata->length() << endl;
     }
   out_rdata = rdata._retn();

@@ -11,6 +11,7 @@
 #include <hrpModel/Link.h>
 #include <hrpModel/Sensor.h>
 #include <hrpModel/ModelLoaderUtil.h>
+#include <hrpUtil/StringUtils.h>
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
 #include <string>
@@ -19,6 +20,7 @@
 #include <stack>
 #include "BodyInfo_impl.h"
 #include <sys/stat.h>
+
 
 using namespace std;
 void xmlTextWriterWriteProperty(const xmlTextWriterPtr writer, const std::string name, const std::string value) {
@@ -301,7 +303,7 @@ int main (int argc, char** argv)
 
   for (int i = 1; i < argc; ++ i) {
     std::string arg(argv[i]);
-    coil::normalize(arg);
+    normalize(arg);
     if ( arg == "--output" ) {
       if (++i < argc) output = argv[i];
     } else if ( arg == "--integrate" ) {
@@ -380,15 +382,15 @@ int main (int argc, char** argv)
         //  2. xxx.wrl,0,0,0,0,0,1,0
         //    To specify both VRML and WAIST offsets.
         //    WAIST offset: for example, "0,0,0,0,0,1,0" -> position offset (3dof) + axis for rotation offset (3dof) + angle for rotation offset (1dof)
-        coil::vstring filename_arg_str = coil::split(*it, ",");
+        vstring filename_arg_str = split(*it, ",");
 	std::string filename = filename_arg_str[0];
         filenames.push_back(filename);
         if ( filename_arg_str.size () > 1 ){ // if WAIST offset is specified 
           for (size_t i = 0; i < 3; i++) {
-            coil::stringTo(WAIST_offset_pos(i), filename_arg_str[i+1].c_str());
-            coil::stringTo(WAIST_offset_rot.axis()(i), filename_arg_str[i+1+3].c_str());
+            stringTo(WAIST_offset_pos(i), filename_arg_str[i+1].c_str());
+            stringTo(WAIST_offset_rot.axis()(i), filename_arg_str[i+1+3].c_str());
           }
-          coil::stringTo(WAIST_offset_rot.angle(), filename_arg_str[1+3+3].c_str());
+          stringTo(WAIST_offset_rot.angle(), filename_arg_str[1+3+3].c_str());
         }
 	hrp::BodyPtr body(new hrp::Body());
 
@@ -516,7 +518,7 @@ int main (int argc, char** argv)
         // store joint properties
         //   [property 1],[value 1],....
         //   ex. --joint-properties RARM_JOINT0.angle,0.0,RARM_JOINT2.mode,HighGain,...
-        coil::vstring joint_properties_arg_str = coil::split(joint_properties, ",");
+        vstring joint_properties_arg_str = split(joint_properties, ",");
         std::map <std::string, std::string> joint_properties_map;
         for (size_t i = 0; i < joint_properties_arg_str.size()/2; i++) {
           joint_properties_map.insert(std::pair<std::string, std::string>(joint_properties_arg_str[i*2], joint_properties_arg_str[i*2+1]));

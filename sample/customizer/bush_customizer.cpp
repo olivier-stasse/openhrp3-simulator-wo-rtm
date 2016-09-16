@@ -4,7 +4,13 @@
 #include <boost/bind.hpp>
 #include <fstream>
 
+//#define CNOID_BODY_CUSTOMIZER
+#ifdef CNOID_BODY_CUSTOMIZER
+#include <cnoid/BodyCustomizerInterface>
+#else
+#include <hrpUtil/StringUtils.h>
 #include <hrpModel/BodyCustomizerInterface.h>
+#endif
 
 #include <iostream>
 
@@ -17,11 +23,19 @@
 #include <hrpUtil/EigenTypes.h>
 #define NS_HRPMODEL hrp
 
-// #ifndef NS_HRPMODEL
-// #define NS_HRPMODEL OpenHRP
-// typedef OpenHRP::vector3 Vector3;
-// typedef OpenHRP::matrix33 Matrix33;
-// #endif
+#ifdef CNOID_BODY_CUSTOMIZER
+#define NS_HRPMODEL cnoid
+cnoid::Matrix3 trans(const cnoid::Matrix3& M) { return M.transpose(); }
+double dot(const cnoid::Vector3& a, const cnoid::Vector3& b) { return a.dot(b); }
+typedef cnoid::Matrix3 Matrix33;
+#endif
+
+
+#ifndef NS_HRPMODEL
+#define NS_HRPMODEL OpenHRP
+typedef OpenHRP::vector3 Vector3;
+typedef OpenHRP::matrix33 Matrix33;
+#endif
 
 using namespace std;
 using namespace boost;
@@ -29,7 +43,7 @@ using namespace NS_HRPMODEL;
 
 static BodyInterface* bodyInterface = 0;
 
-static BodyCustomizerInterface aBodyCustomizerInterface;
+static BodyCustomizerInterface bodyCustomizerInterface;
 
 struct JointValSet
 {
@@ -64,13 +78,7 @@ static std::string robot_model_name;
 // Bush configuration parameters such as:
 //   bush_config: joint1,spring1,damping1 joint2,spring2,damping2 joint3,spring3,damping3 ...
 //   joint* should be included in VRML file.
-struct BushConfigurationParam
-{
-  std::string name;
-  std::string spring;
-  std::string damping;
-};
-static std::vector<BushConfigurationParam> bush_config;
+static vstring bush_config;
 
 static const char** getTargetModelNames()
 {
@@ -86,16 +94,22 @@ static void getVirtualbushJoints(BushCustomizer* customizer, BodyHandle body)
   customizer->hasVirtualBushJoints = true;
   for (size_t i = 0; i < bush_config.size(); i++) {
     // tmp_config <= temp bush config, e.g., "joint*,spring*,damping*"
-    int bushIndex = bodyInterface->getLinkIndexFromName(body, bush_config[i].name.c_str());
+    vstring tmp_config = split(bush_config[i], ",");
+    // Check size
+    if ( tmp_config.size() != 3 ) {
+      std::cerr << "[Bush customizer]   Parameter size mismatch (" << i << ") (" << tmp_config.size() << ")" << std::endl;
+      return;
+    }
+    int bushIndex = bodyInterface->getLinkIndexFromName(body, tmp_config[0].c_str());
     if(bushIndex < 0){
-      std::cerr << "[Bush customizer]   No such joint name (" << bush_config[i].name << ")" << std::endl;
+      std::cerr << "[Bush customizer]   No such joint name (" << tmp_config[0] << ")" << std::endl;
       customizer->hasVirtualBushJoints = false;
     } else {
       BushCustomizerParam p;
       p.index = bushIndex;
-      p.name = bush_config[i].name;
-      p.spring = atof(bush_config[i].spring.c_str());
-      p.damping= atof(bush_config[i].damping.c_str());
+      p.name = tmp_config[0];
+      p.spring = atof(tmp_config[1].c_str());
+      p.damping= atof(tmp_config[2].c_str());
       p.jointValSets.valuePtr = bodyInterface->getJointValuePtr(body, bushIndex);
       p.jointValSets.velocityPtr = bodyInterface->getJointVelocityPtr(body, bushIndex);
       p.jointValSets.torqueForcePtr = bodyInterface->getJointForcePtr(body, bushIndex);
@@ -135,24 +149,13 @@ static void destroy(BodyCustomizerHandle customizerHandle)
 
 static void setVirtualJointForces(BodyCustomizerHandle customizerHandle)
 {
-  std::cout << "bush_customizer going through setVirtualJointForces " 
-	    << std::endl;
   BushCustomizer* customizer = static_cast<BushCustomizer*>(customizerHandle);
-
-  std::cout << customizer->hasVirtualBushJoints << " "
-	    << customizer->params.size() 
-	    << std::endl;
 
   if(customizer->hasVirtualBushJoints){
     for(int i=0; i < customizer->params.size(); ++i){
       BushCustomizerParam& param = customizer->params[i];
       *(param.jointValSets.torqueForcePtr) = - param.spring * (*param.jointValSets.valuePtr) - param.damping * (*param.jointValSets.velocityPtr);
-      std::cout << "Bush " << i << " " << 0 << " " 
-		<< *(param.jointValSets.torqueForcePtr) << " = " 
-		<< *(param.jointValSets.valuePtr) << " + " 
-		<< *(param.jointValSets.velocityPtr) 
-		<< " ( " << param.spring << " , " << param.damping << " )"
-		<< std::endl;
+      //std::cerr << "Bush " << i << " " << 0 << " " << *(param.jointValSets.torqueForcePtr) << " = " << *(param.jointValSets.valuePtr) << " + " << *(param.jointValSets.velocityPtr) << std::endl;
     }
   }
 }
@@ -166,37 +169,29 @@ NS_HRPMODEL::BodyCustomizerInterface* getHrpBodyCustomizerInterface(NS_HRPMODEL:
     std::ifstream ifs(tmpenv);
     if (ifs.fail() ) {
       std::cerr << "[Bush customizer] Could not open [" << tmpenv << "]" << std::endl;
-    }
-    else 
-    {
+    } else {
       std::string tmpstr;
       std::cerr << "[Bush customizer] Open [" << tmpenv << "]" << std::endl;
-      ifs >> robot_model_name ;
-      std::cerr << "[Bush customizer]   robot_model_name = [" << robot_model_name << "]" << std::endl;
-      
-      while(!ifs.eof())
-	{
-	  struct BushConfigurationParam abush_config;
-	  ifs >> abush_config.name;
-	  ifs >> abush_config.spring;
-	  ifs >> abush_config.damping;
-	  if (abush_config.name.size()>0)
-	    {
-	      bush_config.push_back(abush_config);
-	      std::cerr << "[Bush customizer]   bush_config = [" << abush_config.name<< "]" << std::endl;
-	    }
+      while (std::getline(ifs,tmpstr)) {
+        vstring config_params = split(tmpstr, ":");
+        if (config_params[0] == "robot_model_name") {
+          robot_model_name = config_params[1];
+          std::cerr << "[Bush customizer]   robot_model_name = [" << robot_model_name << "]" << std::endl;
+        } else if ( config_params[0] == "bush_config" ) {
+          bush_config = split(config_params[1], " ");
+          std::cerr << "[Bush customizer]   bush_config = [" << config_params[1] << "]" << std::endl;
         }
+      }
     }
-
   }
 
-  aBodyCustomizerInterface.version = NS_HRPMODEL::BODY_CUSTOMIZER_INTERFACE_VERSION;
-  aBodyCustomizerInterface.getTargetModelNames = getTargetModelNames;
-  aBodyCustomizerInterface.create = create;
-  aBodyCustomizerInterface.destroy = destroy;
-  aBodyCustomizerInterface.initializeAnalyticIk = NULL;
-  aBodyCustomizerInterface.calcAnalyticIk = NULL;
-  aBodyCustomizerInterface.setVirtualJointForces = setVirtualJointForces;
+  bodyCustomizerInterface.version = NS_HRPMODEL::BODY_CUSTOMIZER_INTERFACE_VERSION;
+  bodyCustomizerInterface.getTargetModelNames = getTargetModelNames;
+  bodyCustomizerInterface.create = create;
+  bodyCustomizerInterface.destroy = destroy;
+  bodyCustomizerInterface.initializeAnalyticIk = NULL;
+  bodyCustomizerInterface.calcAnalyticIk = NULL;
+  bodyCustomizerInterface.setVirtualJointForces = setVirtualJointForces;
 
-  return &aBodyCustomizerInterface;
+  return &bodyCustomizerInterface;
 }

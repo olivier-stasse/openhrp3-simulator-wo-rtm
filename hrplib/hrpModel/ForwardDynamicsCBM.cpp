@@ -706,7 +706,7 @@ void ForwardDynamicsMM::solveUnknownAccels(const Vector3& fext, const Vector3& t
 	}
         c1 -= d1;
 	c1 -= b1.col(0);
-	
+
         dvector a(M11.colPivHouseholderQr().solve(c1));
 
 	if(unknown_rootDof){
@@ -747,7 +747,6 @@ void ForwardDynamicsMM::calcAccelFKandForceSensorValues(Link* link, Vector3& out
 	ForceSensorInfo& info = forceSensorInfo[link->index];
 
 	if(CALC_ALL_JOINT_TORQUES || info.hasSensorsAbove){
-
         Vector3 fg(-link->m * g);
         Vector3 tg(link->wc.cross(fg));
 

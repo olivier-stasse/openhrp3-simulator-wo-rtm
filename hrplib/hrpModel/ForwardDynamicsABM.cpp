@@ -23,7 +23,7 @@ using namespace hrp;
 using namespace std;
 
 
-static const bool debugMode = false;
+static const bool debugMode = true;
 static const bool rootAttitudeNormalizationEnabled = false;
 
 
@@ -485,14 +485,7 @@ void ForwardDynamicsABM::updateForceSensor(ForceSensor* sensor)
 
 	//    | f   | = | Ivv  trans(Iwv) | * | dvo | + | pf   |
 	//    | tau |   | Iwv     Iww     |   | dw  |   | ptau |
-	   
 	Vector3 f  (-(link->Ivv * link->dvo + link->Iwv.transpose() * link->dw + link->pf));
-	if (link->name=="RLEG_BUSH_Z")
-	  {
-	    std::cout << "ABM - RLEG_BUSH_Z: " 
-		      << f
-		      << std::endl;
-	  }
 
 	Vector3 tau(-(link->Iwv * link->dvo + link->Iww * link->dw + link->ptau));
 
@@ -500,17 +493,10 @@ void ForwardDynamicsABM::updateForceSensor(ForceSensor* sensor)
 	Vector3 fs(sensorR.transpose() * f);
 	Vector3 sensorPos(link->p + link->R * sensor->localPos);
 	Vector3 ts(sensorR.transpose() * (tau - sensorPos.cross(f)));
-
+	
 	sensor->f   = fs;
 	sensor->tau = ts;
 
-	if(debugMode){
-		cout << "sensor " << sensor->name << ": ";
-		cout << "f = " << f;
-		cout << "R = " << sensorR;
-		cout << "sensor->f = " << sensor->f;
-		cout << endl;
-	}
 }
 
 

@@ -23,7 +23,7 @@
             <property name="isRobot" value="true"/>
             <property name="SPRING_JOINT.angle" value="0.0 "/>
         </item>
-        <item class="com.generalrobotix.ui.item.GrxModelItem" name="floor" select="true" url="@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/longfloor.wrl">
+        <item class="com.generalrobotix.ui.item.GrxModelItem" name="longfloor" select="true" url="@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/longfloor.wrl">
             <property name="isRobot" value="true"/>
             <property name="WAIST.rotation" value="0.0 1.0 0.0 0.0 "/>
             <property name="WAIST.translation" value="0.018588250983157195 -0.001149359392002225 -0.09999999903384155 "/>

@@ -49,6 +49,13 @@ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/schedulerproject.${SH_SFX}
   DESTINATION example/${PROJECT_NAME}/scheduler
   PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
+configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/schedulerproject-sample1-bush.${SH_SFX}.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/schedulerproject-sample1-bush.${SH_SFX}")
+
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/schedulerproject-sample1-bush.${SH_SFX} 
+  DESTINATION example/${PROJECT_NAME}/scheduler
+  PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
 add_executable(schedulerproject
   mainschedulerproject.cpp
   loadproject.cpp

@@ -82,7 +82,7 @@ namespace hrp {
     };
 
     typedef boost::shared_ptr<ModelNodeSet> ModelNodeSetPtr;
-};
+}
     
 
 #endif

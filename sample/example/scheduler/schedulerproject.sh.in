@@ -1,6 +1,11 @@
+rm /tmp/openhrp-model-loader.log
+export HRPMODEL_CUSTOMIZER_PATH=@CMAKE_INSTALL_PREFIX@/lib/customizer
+export BUSH_CUSTOMIZER_CONFIG_PATH=@CMAKE_INSTALL_PREFIX@/share/customizer/springJoint_param.conf
+echo "HRPMODEL_CUSTOMIZER_PATH=" $HRPMODEL_CUSTOMIZER_PATH
+echo "BUSH_CUSTOMIZER_CONFIG_PATH=" $BUSH_CUSTOMIZER_CONFIG_PATH
 @CMAKE_INSTALL_PREFIX@/bin/openhrp-model-loader &> /tmp/openhrp-model-loader.log &
 @CMAKE_INSTALL_PREFIX@/bin/openhrp-collision-detector &> /tmp/openhrp-collision-detector.log &
-@CMAKE_INSTALL_PREFIX@/bin/openhrp-aist-dynamics-simulator &> /tmp/openhrp-aist-dynamics.log &
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-aist-dynamics-simulator &> /tmp/openhrp-aist-dynamics-simulator.log &
 @CMAKE_INSTALL_PREFIX@/bin/gepetto-online-viewer &> /tmp/gepetto-viewer.log &
 @CMAKE_INSTALL_PREFIX@/bin/controller-sample &> /tmp/controller-sample.log &
 /bin/sleep 1
