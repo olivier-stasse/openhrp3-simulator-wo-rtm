@@ -1,0 +1,12 @@
+rm /tmp/openhrp-model-loader.log
+export HRPMODEL_CUSTOMIZER_PATH=@CMAKE_INSTALL_PREFIX@/lib/customizer
+export BUSH_CUSTOMIZER_CONFIG_PATH=@CMAKE_INSTALL_PREFIX@/share/customizer/sample1_bush_customizer_param.conf
+echo "HRPMODEL_CUSTOMIZER_PATH=" $HRPMODEL_CUSTOMIZER_PATH
+echo "BUSH_CUSTOMIZER_CONFIG_PATH=" $BUSH_CUSTOMIZER_CONFIG_PATH
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-model-loader &> /tmp/openhrp-model-loader.log &
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-collision-detector &> /tmp/openhrp-collision-detector.log &
+@CMAKE_INSTALL_PREFIX@/bin/openhrp-aist-dynamics-simulator &> /tmp/openhrp-aist-dynamics-simulator.log &
+@CMAKE_INSTALL_PREFIX@/bin/gepetto-online-viewer &> /tmp/gepetto-viewer.log &
+@CMAKE_INSTALL_PREFIX@/bin/controller-sample &> /tmp/controller-sample.log &
+/bin/sleep 1
+@CMAKE_INSTALL_PREFIX@/example/@PROJECT_NAME@/scheduler/schedulerproject -url @CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/project/sample1_bush.xml
