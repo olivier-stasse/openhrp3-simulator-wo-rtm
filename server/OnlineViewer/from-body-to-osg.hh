@@ -115,6 +115,9 @@ protected:
   /* NIL value for appearance info. */
   OLVAppearanceInfo null_olv_appearance_info_;
   int m_Debug;
+
+  // Avoid reetrance
+  bool busy_;
 };
 
 class FromBodyToOsgDataType : public osg::Referenced

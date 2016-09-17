@@ -19,6 +19,7 @@ FromBodyToOsg::FromBodyToOsg(CORBA::ORB_ptr orb)
   : orb_(CORBA::ORB::_duplicate(orb))
 {
   m_Debug=0;
+  busy_ = false;
 }
 
 
@@ -687,6 +688,7 @@ void FromBodyToOsg::load(GroupNodePtr_t & world,
 			 const char *name,
 			 const char *url)
 {
+  busy_ = true;
   graphics::GroupNodePtr_t new_osg_obj;
   OLVBodyInfo an_olv_body_info;
 
@@ -725,10 +727,16 @@ void FromBodyToOsg::load(GroupNodePtr_t & world,
   // Create related Osg objects
   analysis_shape_info_sequence(aBodyInfo,
 			       map_of_bodys_[obj_name]);
+
+  busy_ = false;
 }
 
 void FromBodyToOsg::update(const ::OpenHRP::WorldState & state)
 {
+  if (busy_)
+    return;
+  else busy_=true;
+    
   if (m_Debug)
     std::cout << "time: "<< state.time <<std::endl;
 
@@ -791,6 +799,7 @@ void FromBodyToOsg::update(const ::OpenHRP::WorldState & state)
 	    }
 	}
     }
+  busy_=false;
 }
 
 void FromBodyToOsg::display()

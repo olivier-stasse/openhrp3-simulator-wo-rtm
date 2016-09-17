@@ -36,7 +36,9 @@ void MainWindow::InitWindowManager()
       anOrbitManipulator->setDistance(0.95);
     }
   else
-    std::cout << "Unable to detect: " << typeid(viewer_ptr.get()->getCameraManipulator()).name() << std::endl;
+    {
+      std::cout << "Unable to detect: " << typeid(viewer_ptr.get()->getCameraManipulator()).name() << std::endl;
+    }
 
   keyboardEventHandler->setViewerRef(viewer_ptr);
 
