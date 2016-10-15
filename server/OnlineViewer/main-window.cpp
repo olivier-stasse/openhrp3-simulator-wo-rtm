@@ -62,6 +62,9 @@ void MainWindow::InitWindowManager()
 
   viewer_ptr.get()->getCameraManipulator()->setByMatrix(aViewMatrix);
 
+  viewer_ptr.get()->getCamera()->setClearColor(osg::Vec4(0.1f,0.1f,0.3f,1.0f));
+  viewer_ptr.get()->getCamera()->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  
 }
 osg::Node * createLights(osg::StateSet* rootStateSet)
 {
@@ -71,15 +74,13 @@ osg::Node * createLights(osg::StateSet* rootStateSet)
   // create a spot light.
   osg::Light* myLight1 = new osg::Light;
   myLight1->setLightNum(0);
-  myLight1->setPosition(osg::Vec4(3.0f,0.0f,4.0f,1.0f));
+  myLight1->setPosition(osg::Vec4(0.0f,0.0f,75.0f,1.0f));
   myLight1->setAmbient(osg::Vec4(0.8f,0.8f,0.8f,1.0f));
   myLight1->setDiffuse(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
-  //myLight1->setSpotCutoff(50.0f);
-  //myLight1->setSpotExponent(100.0f);
   myLight1->setConstantAttenuation(1.0f);
-  //myLight1->setSpecular(osg::Vec4(0.5f,0.5f,0.5f,0.5f));
-  myLight1->setDirection(osg::Vec3(-1.0f,0.0f,-1.0f));
-	
+  myLight1->setDirection(osg::Vec3(0.0f,0.0f,-1.0f));
+  myLight1->setSpecular(osg::Vec4(0.5f,0.5f,0.5f,0.5f));	
+
   osg::LightSource* lightS1 = new osg::LightSource;
   lightS1->setLight(myLight1);
   lightS1->setLocalStateSetModes(osg::StateAttribute::ON);
