@@ -369,55 +369,41 @@ void SchedulerProject::initParallelMecanisms()
       idModel++)
     {
       OpenHRP::BodyInfo_var aBodyInfo = 
-	(*aListOfModelItems_.get())[idModel].bodyInfoVar;
+   	(*aListOfModelItems_.get())[idModel].bodyInfoVar;
       ODEBUG(std::cout << aBodyInfo->name() << std::endl);
 
-      if (!strcmp(aBodyInfo->name(),"HRP2JRL"))
+      OpenHRP::ExtraJointInfoSequence_var 
+	anExtraJointInfoSequence = aBodyInfo->extraJoints();
+
+      ODEBUG(std::cout << "Nb of extra joints:" << anExtraJointInfoSequence->length() << std::endl);
+      for(unsigned int idExtraJointInfo=0;
+	  idExtraJointInfo<anExtraJointInfoSequence->length();
+	  idExtraJointInfo++)
 	{
-	  ODEBUG(std::cout << "Enter in Extra joints for HRP2JRL" << std::endl);
-	  // TO DO EXTRACT EXTRA JOINTS
-	  DblSequence3 aLink1LocalPos,aLink2LocalPos;
-	  aLink1LocalPos.length(3); aLink2LocalPos.length(3);
-	  aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = 0.004; 	aLink1LocalPos[2] = -0.11;
-	  aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
-	  DblSequence3 aJointAxis;
-	  aJointAxis.length(3);
-	  aJointAxis[0] = 1.0; aJointAxis[1] = 0.0; aJointAxis[2] = 0.0;
+	  ODEBUG(std::cout << "Extra joint "<< anExtraJointInfoSequence[idExtraJointInfo].name <<std::endl);
+	  ODEBUG(std::cout << aBodyInfo->name() << " "<<  anExtraJointInfoSequence[idExtraJointInfo].link[0] <<std::endl);
+	  ODEBUG(std::cout << aBodyInfo->name() << " "<<  anExtraJointInfoSequence[idExtraJointInfo].link[1] <<std::endl);
+	 
+	  OpenHRP::DblSequence3 point1,point2,laxis;
+	  point1.length(3);point2.length(3); laxis.length(3);
+	  for(unsigned int i=0;i<3;i++)
+	    {
+	      point1[i] = anExtraJointInfoSequence[idExtraJointInfo].point[0][i];
+	      point2[i] = anExtraJointInfoSequence[idExtraJointInfo].point[1][i];
+	      laxis[i] = anExtraJointInfoSequence[idExtraJointInfo].axis[i];
+	    };
+	  ODEBUG(std::cout << "(" << point1[0] << "," << point1[1] << ","<< point1[2] << ")" << std::endl);
+	  ODEBUG(std::cout << "(" << point2[0] << "," << point2[1] << ","<< point2[2] << ")" << std::endl);
+	  ODEBUG(std::cout << anExtraJointInfoSequence[idExtraJointInfo].jointType <<std::endl);
+	  ODEBUG(std::cout << "(" << laxis[0] << "," << laxis[1] << ","<< laxis[2] << ")" << std::endl);
 	  
-	  // Close the kinematic chain of the Right hand - gripper
-	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), "RARM_JOINT5",
-						 aBodyInfo->name(), "RHAND_JOINT1",
-						 aLink1LocalPos, aLink2LocalPos,
-						 ExtraJointType::EJ_XYZ,
-						 aJointAxis,
-						 "RL6RL1");
-	  
-	  aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = -0.004; 	aLink1LocalPos[2] = -0.115;
-	  aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
-	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), "RARM_JOINT5",
-						 aBodyInfo->name(), "RHAND_JOINT4",
-						 aLink1LocalPos, aLink2LocalPos,
-						 ExtraJointType::EJ_XYZ,
-						 aJointAxis,
-						 "RH2RL4");
-	  
-	  // Close the kinematic chain of the Left hand - gripper
-	  aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = -0.004; 	aLink1LocalPos[2] = -0.11;
-	  aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
-	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), "LARM_JOINT5",
-						 aBodyInfo->name(), "LHAND_JOINT1",
-						 aLink1LocalPos, aLink2LocalPos,
-						 ExtraJointType::EJ_XYZ,
-						 aJointAxis,
-						 "RL6RL1");
-	  aLink1LocalPos[0] = 0.0; 	aLink1LocalPos[1] = 0.004; 	aLink1LocalPos[2] = -0.11;
-	  aLink2LocalPos[0] = 0.0; 	aLink2LocalPos[1] = 0.0; aLink2LocalPos[2] = 0.06 ;
-	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), "LARM_JOINT5",
-						 aBodyInfo->name(), "LHAND_JOINT4",
-						 aLink1LocalPos, aLink2LocalPos,
-						 ExtraJointType::EJ_XYZ,
-						 aJointAxis,
-						 "RH2RL4");
+	  dynamicsSimulator_->registerExtraJoint(aBodyInfo->name(), anExtraJointInfoSequence[idExtraJointInfo].link[0],
+						 aBodyInfo->name(), anExtraJointInfoSequence[idExtraJointInfo].link[1],
+   						 point1, 
+   						 point2, 
+						 anExtraJointInfoSequence[idExtraJointInfo].jointType,
+   						 laxis,
+   						 anExtraJointInfoSequence[idExtraJointInfo].name);
 	}
     }
   ODEBUG(std::cout << "initParallelMecanisms end" << std::endl;)
