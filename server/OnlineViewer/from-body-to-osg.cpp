@@ -30,12 +30,13 @@ FromBodyToOsg::~FromBodyToOsg()
 
 void FromBodyToOsg::display_appearance(OpenHRP::AppearanceInfo & an_appearance)
 {
+  
   std::cout << "materialIndex: " << an_appearance.materialIndex << std::endl;
   
   std::cout << "Nb of normals: " << an_appearance.normals.length()/3 << std::endl;
-  
-  if (0)
+  if (m_Debug>1)
     {
+
       for(unsigned int id_normal_idx=0;
 	  id_normal_idx<an_appearance.normals.length();
 	  id_normal_idx+=3)
@@ -47,7 +48,7 @@ void FromBodyToOsg::display_appearance(OpenHRP::AppearanceInfo & an_appearance)
   std::cout << "Nb of normalIndices: " 
 	    << an_appearance.normalIndices.length() << std::endl;
   
-  if (0)
+  if (m_Debug>1)
     {
       for(unsigned int id_normal_idx=0;
 	  id_normal_idx<an_appearance.normalIndices.length();
@@ -61,24 +62,23 @@ void FromBodyToOsg::display_appearance(OpenHRP::AppearanceInfo & an_appearance)
   
   std::cout << "solid: " 
 	    << an_appearance.solid << std::endl;
-
+  
   std::cout << "creaseAngle: " 
 	    << an_appearance.creaseAngle << std::endl;
-
+  
   std::cout << "colors: " 
 	    << an_appearance.colors.length() << std::endl;
   
   std::cout << "colorPerVertex: " 
 	    << an_appearance.colorPerVertex << std::endl;
-
+      
   std::cout << "textureIndex: " << an_appearance.textureIndex << std::endl;
   
   std::cout << "textureCoordinate: " 
 	    << an_appearance.textureCoordinate.length() << std::endl;
-
+  
   std::cout << "textureCoordinateIndices: " 
 	    << an_appearance.textureCoordIndices.length() << std::endl;
-  
   
 }
 
@@ -116,6 +116,7 @@ void FromBodyToOsg::display_body(OpenHRP::BodyInfo_var aBodyInfo)
     {
       std::cout << "Name " << aBodyInfo->name() << std::endl;
       std::cout << "Url: " << aBodyInfo->url() << std::endl;
+      std::cout << "---------------------Display Info ----------------------" << std::endl;
     }
 
   OpenHRP::StringSequence_var anInfoSeq = aBodyInfo->info();
@@ -125,12 +126,21 @@ void FromBodyToOsg::display_body(OpenHRP::BodyInfo_var aBodyInfo)
       if (m_Debug)
 	std::cout << "Info: " << anInfo << std::endl;
     }
-
+  
+  if (m_Debug)
+    {
+      std::cout << "---------------------End of Display Info ----------------------" << std::endl;
+      std::cout << "---------------------Display LinkSeq ----------------------" << std::endl;
+    }
   OpenHRP::LinkInfoSequence_var aLinkSeq = aBodyInfo->links();
   for(unsigned int id=0;id < aLinkSeq->length();id++)
     {
       OpenHRP::LinkInfo aLinkInfo = aLinkSeq[id];
       display_link(aLinkInfo);
+    }
+  if (m_Debug)
+    {
+      std::cout << "---------------------End of Display LinkSeq ----------------------" << std::endl;
     }
 
   OpenHRP::ShapeInfoSequence_var aShapeInfoSeq = aBodyInfo->shapes();
@@ -141,15 +151,19 @@ void FromBodyToOsg::display_body(OpenHRP::BodyInfo_var aBodyInfo)
   OpenHRP::AppearanceInfoSequence_var anAppearanceInfoSeq = 
     aBodyInfo->appearances();
   
-  //  if (m_Debug)
+  if (m_Debug)
     {
+      std::cout << "---------------------Display Appearance InfoSeq ----------------------" << std::endl;
       std::cout << "Number of appearances: " << anAppearanceInfoSeq->length()
 		<< std::endl;
-      
       for(unsigned int id_app=0;
 	  id_app < anAppearanceInfoSeq->length();
 	  id_app++)
-	display_appearance(anAppearanceInfoSeq[id_app]);
+	{
+	  std::cout << "Appearance index: " << id_app << std::endl;
+	  display_appearance(anAppearanceInfoSeq[id_app]);
+	}
+      std::cout << "---------------------End of Display Appearance InfoSeq ----------------------" << std::endl;
     }
 
   OpenHRP::MaterialInfoSequence_var aMaterialInfoSeq = 
@@ -157,6 +171,7 @@ void FromBodyToOsg::display_body(OpenHRP::BodyInfo_var aBodyInfo)
   
   if (m_Debug)
     {
+      std::cout << "---------------------Display Material InfoSeq ----------------------" << std::endl;
       std::cout << "Number of materials: " << aMaterialInfoSeq->length()
 		<< std::endl;
       
@@ -164,6 +179,7 @@ void FromBodyToOsg::display_body(OpenHRP::BodyInfo_var aBodyInfo)
 	  id_mat < aMaterialInfoSeq->length();
 	  id_mat++)
 	display_material(aMaterialInfoSeq[id_mat]);
+      std::cout << "---------------------End of Display Material InfoSeq ----------------------" << std::endl;
     }
 
   OpenHRP::TextureInfoSequence_var aTextureInfoSeq =
@@ -194,6 +210,10 @@ void FromBodyToOsg::display_link(OpenHRP::LinkInfo & aLinkInfo)
     	    << aLinkInfo.rotation[2] << " "
 	    << aLinkInfo.rotation[3] << std::endl;
 
+  std::cout << "ShapeIndices: ";
+  for (unsigned int i=0;i<aLinkInfo.shapeIndices.length();i++)
+    std::cout << aLinkInfo.shapeIndices[i].shapeIndex << " " ;
+  std::cout << std::endl;
 }
 
 OLVAppearanceInfo & FromBodyToOsg::
@@ -394,7 +414,7 @@ void FromBodyToOsg::insert_mesh(GeometricPrimitiveInsertParameters &aGPIP)
 			    aMaterialInfo.diffuseColor[1],
 			    aMaterialInfo.diffuseColor[2],
 			    aMaterialInfo.shininess);
-	  
+			    	  
 	  colors->push_back(a_color);
 	}
     }
@@ -425,7 +445,7 @@ void FromBodyToOsg::insert_mesh(GeometricPrimitiveInsertParameters &aGPIP)
 		  << anAppearanceInfo.normals[id_normal+2] 
 		  << std::endl;
       normals->push_back(osg::Vec3(anAppearanceInfo.normals[id_normal],
-				   anAppearanceInfo.normals[id_normal+1],
+       				   anAppearanceInfo.normals[id_normal+1],
 				   anAppearanceInfo.normals[id_normal+2]));
     }
   if (m_Debug)
@@ -736,7 +756,7 @@ void FromBodyToOsg::update(const ::OpenHRP::WorldState & state)
   if (busy_)
     return;
   else busy_=true;
-    
+
   if (m_Debug)
     std::cout << "time: "<< state.time <<std::endl;
 
@@ -800,6 +820,7 @@ void FromBodyToOsg::update(const ::OpenHRP::WorldState & state)
 	}
     }
   busy_=false;
+
 }
 
 void FromBodyToOsg::display()
