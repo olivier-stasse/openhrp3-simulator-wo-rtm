@@ -98,7 +98,6 @@ endif()
 # OnlineViewer
 if(UNIX)
   add_required_dependency("gepetto-viewer")
-  search_for_pthread()
   include_directories(${GEPETTO_VIEWER_INCLUDE_DIR})
 
   add_required_dependency("libxml-2.0")
