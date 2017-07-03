@@ -73,3 +73,6 @@ pkg_config_use_dependency(schedulerproject libxml-2.0)
 install(TARGETS schedulerproject
   DESTINATION example/${PROJECT_NAME}/scheduler
   CONFIGURATIONS Release Debug RelWithDebInfo)
+
+# Installation to have the program launched through roslaunch.
+install(TARGETS schedulerproject DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME})
