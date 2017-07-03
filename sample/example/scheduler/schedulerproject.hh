@@ -48,6 +48,7 @@ protected:
   //void initRobotsFreeFlyerPosition();
   //void initRobotsPose();
   void initRobotsJointData();
+  void setTorqueToZero();
   void initParallelMecanisms();
   void initCollisions();
   void saveLog(double ltime);
@@ -62,6 +63,13 @@ protected:
 		       //OpenHRP::BodyInfo_var  aBodyInfo,
 		       std::string &CharacterName,
 		       CORBA::String_var CORBAbodyName);
+  void setBodyVelocity(std::string &CharacterName,
+		       CORBA::String_var CORBAbodyName);
+  void setBodyAcceleration(std::string &CharacterName,
+			   CORBA::String_var CORBAbodyName);
+  void setBodyTorque(std::string &CharacterName,
+		     CORBA::String_var CORBAbodyName);
+
   void setBodyAngle(JointData &aJointData,
 		    //OpenHRP::BodyInfo_var  aBodyInfo,
 		    std::string &CharacterName,
