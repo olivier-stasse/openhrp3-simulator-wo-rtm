@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 include(cmake/base.cmake)
 include(cmake/boost.cmake)
 include(cmake/ros.cmake)
+include(cmake/pthread.cmake)
 
 project(openhrp3_simulator_wo_rtm)
 
