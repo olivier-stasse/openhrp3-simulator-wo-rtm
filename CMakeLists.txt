@@ -7,7 +7,7 @@ include(cmake/pthread.cmake)
 
 project(openhrp3_simulator_wo_rtm)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation std_srvs geometry_msgs sensor_msgs tf)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
 
 set(PROJECT_NAME openhrp3_simulator_wo_rtm)
 set(PROJECT_DESCRIPTION "OpenHRP simulator")
@@ -35,6 +35,8 @@ set(OPENHRP_SIMULATOR_VERSION_MINOR 1)
 set(OPENHRP_SIMULATOR_VERSION_MICRO 3)
 
 set(OPENHRP_LIBRARY_VERSION "${OPENHRP_SIMULATOR_VERSION_MAJOR}.${OPENHRP_SIMULATOR_VERSION_MINOR}.${OPENHRP_SIMULATOR_VERSION_MICRO}")
+
+catkin_package(CATKIN_DEPENDS message_runtime roscpp)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 # Add local modules
@@ -121,8 +123,6 @@ add_subdirectory(hrplib)
 add_subdirectory(server)
 add_subdirectory(sample)
 add_subdirectory(scripts)
-
-catkin_package(CATKIN_DEPENDS message_runtime roscpp realtime_tools tf)
 
 install(FILES package.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
