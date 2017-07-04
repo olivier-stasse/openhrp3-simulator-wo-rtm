@@ -8,8 +8,6 @@ project(openhrp3_simulator_wo_rtm)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation std_srvs geometry_msgs sensor_msgs tf)
 
-catkin_package(CATKIN_DEPENDS message_runtime roscpp realtime_tools tf)
-
 set(PROJECT_NAME openhrp3_simulator_wo_rtm)
 set(PROJECT_DESCRIPTION "OpenHRP simulator")
 set(PROJECT_URL "http://github.com/olivier-stasse/openhrp3-simulator-wo-rtm")
@@ -26,6 +24,8 @@ endif(UNIX)
 
 
 setup_project()
+
+catkin_package(CATKIN_DEPENDS message_runtime roscpp realtime_tools tf)
 
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
