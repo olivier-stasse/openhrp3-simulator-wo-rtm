@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 include(cmake/base.cmake)
-include(cmake/pthread.cmake)
+include(cmake/boost.cmake)
 include(cmake/ros.cmake)
 
 project(openhrp3_simulator_wo_rtm)
@@ -24,8 +24,6 @@ endif(UNIX)
 
 
 setup_project()
-
-catkin_package(CATKIN_DEPENDS message_runtime roscpp realtime_tools tf)
 
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -122,6 +120,8 @@ add_subdirectory(hrplib)
 add_subdirectory(server)
 add_subdirectory(sample)
 add_subdirectory(scripts)
+
+catkin_package(CATKIN_DEPENDS message_runtime roscpp realtime_tools tf)
 
 install(FILES package.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
