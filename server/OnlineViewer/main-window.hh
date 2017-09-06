@@ -14,6 +14,9 @@
 #include <string>
 
 
+// Boost mutex
+#include <boost/thread/mutex.hpp>
+
 // Event handler
 #include <gepetto/viewer/group-node.h>
 #include <gepetto/viewer/window-manager.h>
@@ -45,6 +48,9 @@ protected:
   // Convert BodyInfo object to OSG for display purposes.
   FromBodyToOsg from_body_to_osg_;
 
+  // Mutex 
+  boost::mutex mtx_;
+
 public:
   // Constructor
   MainWindow(CORBA::ORB_ptr orb);
@@ -63,8 +69,8 @@ public:
 	    const char *url);
 
   // Update object.
-void update(const OpenHRP::WorldState &wstate);
-
+  void update(const OpenHRP::WorldState &wstate);
+  
 };
 
 #endif /* _MAIN_WINDOW_H_ */

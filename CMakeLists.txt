@@ -1,9 +1,15 @@
 cmake_minimum_required(VERSION 2.6)
 
 include(cmake/base.cmake)
+include(cmake/boost.cmake)
+include(cmake/ros.cmake)
 include(cmake/pthread.cmake)
 
-set(PROJECT_NAME openhrp3-simulator-wo-rtm)
+project(openhrp3_simulator_wo_rtm)
+
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
+
+set(PROJECT_NAME openhrp3_simulator_wo_rtm)
 set(PROJECT_DESCRIPTION "OpenHRP simulator")
 set(PROJECT_URL "http://github.com/olivier-stasse/openhrp3-simulator-wo-rtm")
 
@@ -30,6 +36,8 @@ set(OPENHRP_SIMULATOR_VERSION_MICRO 3)
 
 set(OPENHRP_LIBRARY_VERSION "${OPENHRP_SIMULATOR_VERSION_MAJOR}.${OPENHRP_SIMULATOR_VERSION_MINOR}.${OPENHRP_SIMULATOR_VERSION_MICRO}")
 
+catkin_package(CATKIN_DEPENDS message_runtime roscpp)
+
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 # Add local modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules/)
@@ -38,7 +46,7 @@ include(FindPkgConfig)
 include(CheckIncludeFiles)
 
 # Check boost
-find_package(Boost 1.35.0 REQUIRED COMPONENTS program_options filesystem signals system regex)
+find_package(Boost 1.35.0 REQUIRED COMPONENTS program_options filesystem signals system regex thread)
 
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
@@ -91,7 +99,6 @@ endif()
 # OnlineViewer
 if(UNIX)
   add_required_dependency("gepetto-viewer")
-  search_for_pthread()
   include_directories(${GEPETTO_VIEWER_INCLUDE_DIR})
 
   add_required_dependency("libxml-2.0")
@@ -115,5 +122,9 @@ add_subdirectory(idl)
 add_subdirectory(hrplib)
 add_subdirectory(server)
 add_subdirectory(sample)
+add_subdirectory(scripts)
+
+install(FILES package.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
 
 setup_project_finalize()

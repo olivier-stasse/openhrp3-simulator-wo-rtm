@@ -133,28 +133,46 @@ void SchedulerProject::loadModels(int argc,char * argv[])
 
  void SchedulerProject::initOLV(int argc, char * argv[])
  {
+   
    olv_ = hrp::getOnlineViewer(argc, argv);
 
-   if (CORBA::is_nil( olv_ )) 
+   bool ok =false;
+   unsigned int Counter=0;
+   do
      {
-       std::cerr << "OnlineViewer not found" << std::endl;
-       return;
-     }
-   try 
-     {
-       for(unsigned int i=0;i<aListOfModelItems_.get()->size();i++)
+       if (CORBA::is_nil( olv_ )) 
 	 {
-	   olv_->load((*aListOfModelItems_.get())[i].name.c_str(),
-		      (*aListOfModelItems_.get())[i].url.c_str());
+	   std::cerr << "OnlineViewer not found" << std::endl;
+	   return;
 	 }
+       try 
+	 {
+	   for(unsigned int i=0;i<aListOfModelItems_.get()->size();i++)
+	     {
+	       cerr << (*aListOfModelItems_.get())[i].name.c_str()<< " " 
+		    << (*aListOfModelItems_.get())[i].url.c_str() << std::endl;
 
-       olv_->clearLog();
-     } 
-   catch (CORBA::SystemException& ex) 
-     {
-       cerr << "Failed to connect GrxUI." << endl;
-       return;
+	       olv_->load((*aListOfModelItems_.get())[i].name.c_str(),
+			  (*aListOfModelItems_.get())[i].url.c_str());
+	     }
+	   
+	   olv_->clearLog();
+	   ok=true;
+	 } 
+       catch (CORBA::SystemException& ex) 
+	 {
+	   cerr << "Failed to connect GrxUI. Attempt: " 
+		<< Counter << " "
+		<< ex._name() << " " << ex._rep_id()
+		<< endl;
+	 }
+       // Wait 100 ms
+       usleep(100000);
+       Counter++;
      }
+   // Try during 20s.
+   while(Counter<200 && !ok);
+   
  }
 
 
@@ -178,22 +196,53 @@ void SchedulerProject::loadModels(int argc,char * argv[])
 					 string & CharacterName,
 					 CORBA::String_var CORBAbodyName)
   {
-
+    DblSequence   velocity; velocity.length(6);
     if ((aJointData.velocity.size()>0) && 
 	(aJointData.angularVelocity.size()>0))
       {
-	DblSequence   velocity; velocity.length(6);
 	for(unsigned int idVel=0;idVel<3;idVel++)
 	  { velocity[idVel] = aJointData.velocity[idVel];
 	    velocity[idVel+3] = aJointData.angularVelocity[idVel];
 	  }
-	dynamicsSimulator_->setCharacterLinkData(CharacterName.c_str(),
-						 CORBAbodyName,
-						 DynamicsSimulator::ABS_VELOCITY, 
-						 velocity );
-     }
+      }
+    else
+      {
+	for(unsigned int idVel=0;idVel<3;idVel++)
+	  { velocity[idVel] =  velocity[idVel+3] = 0.0;
+	  }
+      }
+    dynamicsSimulator_->setCharacterLinkData(CharacterName.c_str(),
+					     CORBAbodyName,
+					     DynamicsSimulator::ABS_VELOCITY, 
+					     velocity );
  }
 
+ void SchedulerProject::setBodyAcceleration(string & CharacterName,
+					 CORBA::String_var CORBAbodyName)
+ {
+   DblSequence acceleration; acceleration.length(6);
+   for(unsigned int i=0;i<6;i++)
+     acceleration[i] = 0.0;
+   dynamicsSimulator_->setCharacterLinkData(CharacterName.c_str(),
+					    CORBAbodyName,
+					    DynamicsSimulator::ABS_ACCELERATION, 
+					    acceleration );
+ }
+  
+ void SchedulerProject::setBodyTorque(string & CharacterName,
+					 CORBA::String_var CORBAbodyName)
+ {
+   ODEBUG(std::cout << "setBodyTorque: " << CharacterName << " : "
+	  << CORBAbodyName << std::endl);
+   DblSequence torque; torque.length(1);
+   torque[0] = 0.0;
+   dynamicsSimulator_->setCharacterLinkData(CharacterName.c_str(),
+					    CORBAbodyName,
+					    DynamicsSimulator::JOINT_TORQUE, 
+					    torque );
+ }
+
+ 
  struct AxisAngle4f
  {
    double x,y,z,angle;
@@ -259,13 +308,14 @@ void SchedulerProject::setBodyAbsolutePosition(JointData &aJointData,
 	  << aJointData.translation.size() << " "
 	  << aJointData.rotation.size()
 	  << std::endl);
+  DblSequence TransformArray; TransformArray.length(12);
+
   if ((aJointData.translation.size()>0) && 
       (aJointData.rotation.size()>0))
     {
       ODEBUG(std::cout << "initialize absolute position of :"
 	     << CharacterName << " link: " << CORBAbodyName << std::endl);
 	     
-      DblSequence TransformArray; TransformArray.length(12);
       for(unsigned int i=0;i<3;i++)
 	TransformArray[i] = aJointData.translation[i];
       
@@ -279,19 +329,28 @@ void SchedulerProject::setBodyAbsolutePosition(JointData &aJointData,
       TransformArray[3] = aRotation.m00;TransformArray[4]  = aRotation.m01;TransformArray[5]  = aRotation.m02;
       TransformArray[6] = aRotation.m10;TransformArray[7]  = aRotation.m11;TransformArray[8]  = aRotation.m12;
       TransformArray[9] = aRotation.m20;TransformArray[10] = aRotation.m21;TransformArray[11] = aRotation.m22;
-      dynamicsSimulator_->setCharacterLinkData(	CharacterName.c_str(),
+    }
+  else
+    {
+      for(unsigned int i=0;i<3;i++)
+	TransformArray[i] = 0.0;
+      TransformArray[3] = 1.0;TransformArray[4]  = 0.0;TransformArray[5]  = 0.0;
+      TransformArray[6] = 0.0;TransformArray[7]  = 1.0;TransformArray[8]  = 0.0;
+      TransformArray[9] = 0.0;TransformArray[10] = 0.0;TransformArray[11] = 1.0;
+    
+    }
+  dynamicsSimulator_->setCharacterLinkData(	CharacterName.c_str(),
 						CORBAbodyName,
 						DynamicsSimulator::ABS_TRANSFORM, 
 						TransformArray );
-      ODEBUG(for(unsigned int i=0;i<4;i++) 
-	       {
-		 for(unsigned int j=0;j<3;j++)
-		   std::cout << TransformArray[i*3+j] << " ";
-		 std::cout << std::endl;
-	       }
+  ODEBUG(for(unsigned int i=0;i<4;i++) 
+	   {
+	     for(unsigned int j=0;j<3;j++)
+	       std::cout << TransformArray[i*3+j] << " ";
+	     std::cout << std::endl;
+	   }
 	     
-	     );
-    }
+	 );
 }
 
 void SchedulerProject::setBodyMode(JointData &aJointData,
@@ -325,6 +384,7 @@ void SchedulerProject::setBodyMode(JointData &aJointData,
 
 void SchedulerProject::initRobotsJointData()
 {
+  ODEBUG(std::cout << "initRobotsJointData() *************** " << simulationData_.get()->integrate);
   if (simulationData_.get()->integrate)
     {
       
@@ -353,11 +413,49 @@ void SchedulerProject::initRobotsJointData()
 	      setBodyAbsolutePosition(aJointData,CharacterName,CORBAbodyName);  // Set Body absoluteposition.
 	      setBodyAngle(aJointData,CharacterName,CORBAbodyName);     // Set Body angle value.
 	      setBodyVelocity(aJointData,CharacterName,CORBAbodyName);  // Set Joint speed.
+	      setBodyAcceleration(CharacterName,CORBAbodyName);     // Set Body acceleration.
+	      setBodyTorque(CharacterName,CORBAbodyName);           // Set Body torque.
 	      setBodyMode(aJointData,CharacterName,CORBAbodyName);  // Set Joint mode.
+
 	    }
 	}
     }
     
+}
+
+void SchedulerProject::setTorqueToZero()
+{
+  ODEBUG(std::cout << "setTorqueToZero() begin" << std::endl);
+  if (simulationData_.get()->integrate)
+    {
+      
+      // Iterate over the robots.
+      for(unsigned int idModel=0;
+	  idModel < aListOfModelItems_.get()->size();
+	  idModel++)
+	{
+	  OpenHRP::BodyInfo_var aBodyInfo = 
+	    (*aListOfModelItems_.get())[idModel].bodyInfoVar;
+	  LinkInfoSequence_var aLinkInfoSequence = aBodyInfo->links();
+
+
+	  // Iterave over the links
+	  for(unsigned int idLinks=0;
+	      idLinks<aLinkInfoSequence->length();
+	      idLinks++)
+	    {
+	      CORBA::String_var CORBAbodyName = 
+		aLinkInfoSequence[idLinks].name;
+	      std::string bodyName(CORBAbodyName);
+	      
+	      JointData aJointData = 
+		(*aListOfModelItems_.get())[idModel].jointsMap[bodyName];
+	      std::string & CharacterName = (*aListOfModelItems_.get())[idModel].name;
+	      setBodyTorque(CharacterName,CORBAbodyName);           // Set Body torque.
+	    }
+	}
+    }
+  ODEBUG(std::cout << "setTorqueToZero() end" << std::endl);    
 }
 
 void SchedulerProject::initParallelMecanisms()
@@ -482,40 +580,50 @@ void SchedulerProject::initDynamicsSimulator()
   
   // Create dynamics simulator
   dynamicsSimulator_ = dynamicsSimulatorFactory->create();
-  
-  // Register robots.
-  cout << "** Dynamics server setup ** " << endl;
-  for(unsigned int i=0;i<aListOfModelItems_.get()->size();i++)
+
+  try
     {
-      OpenHRP::BodyInfo_var aBodyInfo = (*aListOfModelItems_.get())[i].bodyInfoVar;
-      
-      cout << "Character  : |" << (*aListOfModelItems_.get())[i].name << "|" << std::endl
-	   << "Model      : |" << aBodyInfo->name() << "|" << std::endl;
-      dynamicsSimulator_->registerCharacter((*aListOfModelItems_.get())[i].name.c_str(), 
+      // Register robots.
+      cout << "** Dynamics server setup ** " << endl;
+      for(unsigned int i=0;i<aListOfModelItems_.get()->size();i++)
+	{
+	  OpenHRP::BodyInfo_var aBodyInfo = (*aListOfModelItems_.get())[i].bodyInfoVar;
+	  
+	  cout << "Character  : |" << (*aListOfModelItems_.get())[i].name << "|" << std::endl
+	       << "Model      : |" << aBodyInfo->name() << "|" << std::endl;
+	  dynamicsSimulator_->registerCharacter((*aListOfModelItems_.get())[i].name.c_str(), 
 					    aBodyInfo);			    
+	}
+      
+      // Enable sensor and gravity.
+      CORBA::Double ltimestep = simulationData_.get()->timeStep;
+      dynamicsSimulator_->init(ltimestep, 
+			       simulationData_.get()->method,
+			       DynamicsSimulator::ENABLE_SENSOR);
+      DblSequence3 g;
+      g.length(3);
+      g[0] = 0.0;
+      g[1] = 0.0;
+      double world_gravity = simulationData_.get()->gravity;  
+      // default gravity acceleration [m/s^2]
+      g[2] = world_gravity;
+      dynamicsSimulator_->setGVector(g);
+      
+      //initRobotsPose();
+      initRobotsJointData();
+      dynamicsSimulator_->calcWorldForwardKinematics();
+      
+      initCollisions();
+      initParallelMecanisms();
+      dynamicsSimulator_->initSimulation();
+    }
+  catch (CORBA::SystemException& ex) 
+    {
+      cerr << "Failed to connect to dynamicsSimulator: " 
+	   << ex._name() << " " << ex._rep_id()
+	   << endl;
     }
 
-  // Enable sensor and gravity.
-  CORBA::Double ltimestep = simulationData_.get()->timeStep;
-  dynamicsSimulator_->init(ltimestep, 
-			   simulationData_.get()->method,
-			   DynamicsSimulator::ENABLE_SENSOR);
-  DblSequence3 g;
-  g.length(3);
-  g[0] = 0.0;
-  g[1] = 0.0;
-  double world_gravity = simulationData_.get()->gravity;  
-  // default gravity acceleration [m/s^2]
-  g[2] = world_gravity;
-  dynamicsSimulator_->setGVector(g);
-  
-  //initRobotsPose();
-  initRobotsJointData();
-  dynamicsSimulator_->calcWorldForwardKinematics();
-  
-  initCollisions();
-  initParallelMecanisms();
-  dynamicsSimulator_->initSimulation();
 
 }
 
@@ -538,38 +646,70 @@ void SchedulerProject::initController()
 	  aListOfControllers_[i].controller_found = false;
 	  continue; // Go to the next candidate
 	}
+
+      aListOfControllers_[i].controller_found = false;
+      unsigned int Counter=0;
+      do
+	{
+	  
+	  try 
+	    {
+	      aListOfControllers_[i].controllerName = lControllerName;
+	      aListOfControllers_[i].controller = 
+		checkCorbaServer <Controller, Controller_var> 
+		(lControllerName.c_str(), cxt_);
+	      aListOfControllers_[i].controller_found = true;
+	    }
+	  catch (CORBA::SystemException& ex) 
+	    {
+	      cerr << "Failed to connect to " << lControllerName.c_str() << endl;
+	    }
+	  Counter++;
+	}
+      while(Counter<200 && !aListOfControllers_[i].controller_found);
       
-      try 
-	{
-	  aListOfControllers_[i].controllerName = lControllerName;
-	  aListOfControllers_[i].controller = 
-	    checkCorbaServer <Controller, Controller_var> 
-	    (lControllerName.c_str(), cxt_);
-	  aListOfControllers_[i].controller_found = true;
-	}
-      catch (CORBA::SystemException& ex) 
-	{
-	  cerr << "Failed to connect to " << lControllerName.c_str() << endl;
-	  aListOfControllers_[i].controller_found = false;
-	}
+      
       ODEBUG(std::cout << "initController() connected to " 
 	     << lControllerName.c_str() 
 	     << std::endl);
+
       if (CORBA::is_nil(aListOfControllers_[i].controller)) {
 	std::cerr << "Controller " << lControllerName << " not found" << std::endl;
 	aListOfControllers_[i].controller_found = false;
       }
 
+      ODEBUG(std::cout << "Before initializing controller" << lControllerName 
+	     << std::endl);
+
       if (aListOfControllers_[i].controller_found)
 	{
+	  ODEBUG(std::cout << lControllerName.c_str() 
+		 << " character/model set " 
+		 << (*aListOfModelItems_.get())[i].name.c_str()
+		 << std::endl);
+
 	  // Set the character/model name used by the controller.
 	  aListOfControllers_[i].controller->
 	    setModelName(CORBA::string_dup((*aListOfModelItems_.get())[i].name.c_str()));
+	  ODEBUG(std::cout << lControllerName.c_str() 
+		 << " character/model set " 
+		 << std::endl);
+		
 	  // Set the dynamics simulator
 	  aListOfControllers_[i].controller->
 	    setDynamicsSimulator(dynamicsSimulator_);
+
+	  ODEBUG(std::cout << lControllerName.c_str() 
+		 << " set dynamics simulator for the controller " 
+		 << std::endl);
+
 	  // Initialize the controller
 	  aListOfControllers_[i].controller->initialize();
+
+	  ODEBUG(std::cout << lControllerName.c_str() 
+		 << " initialize the controller " 
+		 << std::endl);
+
 	  // Specify the time
 	  aListOfControllers_[i].controller->setTimeStep(controlTimeStep_);
 	  // State the controller
@@ -597,14 +737,14 @@ void SchedulerProject::init(int argc,char * argv[])
   //================== CORBA init ===============================
   initCorba(argc,argv);
   
-  //==================== OnlineViewer (GrxUI) setup ===============
-  initOLV(argc,argv);
-  
+  sleep(5);
   //================= DynamicsSimulator setup ======================
   initDynamicsSimulator();
-  
   // ==================  Controller setup ==========================
   initController();
+  //==================== OnlineViewer (GrxUI) setup ===============
+  initOLV(argc,argv);
+
 }
 
 void SchedulerProject::mainLoop()
@@ -670,7 +810,10 @@ void SchedulerProject::mainLoop()
 	    if (aListOfControllers_[i].controller_found)
 	      aListOfControllers_[i].controller->output();
 	  }
-
+	if (aListOfControllers_.size()==0)
+	  {
+	    setTorqueToZero();
+	  }
       }
     // ================== save log =====================
     saveLog(time);
@@ -708,8 +851,7 @@ void SchedulerProject::saveLog(double ltime)
 	  int lid = aLinkDataType-DynamicsSimulator::JOINT_VALUE;
 	  unsigned int sizeofdata[7] = {1,1,1,1,12,6,6};
 	  LinkInfoSequence_var aLinkInfo = aBodyInfo->links();
-	  std::vector<double>  & avec_data=
-	    listOfLogs_[idModel].jointData[lid];
+	  std::vector<double>  & avec_data = listOfLogs_[idModel].jointData[lid];
 	  avec_data.resize(aLinkInfo->length()*sizeofdata[lid]);
 
 	  for(unsigned int idLink=0;idLink<aLinkInfo->length();idLink++)

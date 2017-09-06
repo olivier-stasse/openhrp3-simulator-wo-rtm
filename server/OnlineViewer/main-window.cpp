@@ -11,7 +11,8 @@ void * osgOnlineViewer_thread(void *arg)
 }
 
 MainWindow::MainWindow(CORBA::ORB_ptr orb):
-  from_body_to_osg_(orb)
+  from_body_to_osg_(orb),
+  mtx_()
 {
   
 }
@@ -64,7 +65,6 @@ void MainWindow::InitWindowManager()
 
   viewer_ptr.get()->getCamera()->setClearColor(osg::Vec4(0.1f,0.1f,0.3f,1.0f));
   viewer_ptr.get()->getCamera()->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
 }
 osg::Node * createLights(osg::StateSet* rootStateSet)
 {
@@ -120,11 +120,16 @@ int MainWindow::spin()
 void MainWindow::load(const char *name,
 		      const char *url)
 {
+  mtx_.lock();
   from_body_to_osg_.load(world_,name,url);
+  mtx_.unlock();
+
 }
 		      
 void MainWindow::update(const OpenHRP::WorldState &wstate)
 {
+  mtx_.lock();
   from_body_to_osg_.update(wstate);
+  mtx_.unlock();
 }
 		      
