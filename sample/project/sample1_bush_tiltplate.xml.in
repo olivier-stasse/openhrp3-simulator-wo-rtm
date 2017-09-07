@@ -1,0 +1,153 @@
+<grxui>
+ <mode name="Simulation">
+  <item class="com.generalrobotix.ui.item.GrxSimulationItem" name="simulationItem">
+   <property name="integrate" value="true"/>
+   <property name="timeStep" value="0.001"/>
+   <property name="totalTime" value="2000000.0"/>
+   <property name="method" value="RUNGE_KUTTA"/>
+   <property name="gravity" value="9.8 "/>
+  </item>
+  <item class="com.generalrobotix.ui.item.GrxModelItem" name="sample1_bush" url="@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/sample1_bush.wrl">
+   <property name="WAIST.NumOfAABB" value="1"/>
+   <property name="WAIST.translation" value="0  0  0.7235"/>
+   <property name="WAIST.rotation" value="1 0 0 0"/>
+   <property name="WAIST.mode" value="Torque"/>
+   <property name="controller" value="SamplePDController"/>
+   <property name="RLEG_HIP_R.angle" value="0.0"/>
+   <property name="RLEG_HIP_R.mode" value="Torque"/>
+   <property name="RLEG_HIP_R.NumOfAABB" value="1"/>
+   <property name="RLEG_HIP_P.angle" value="0.0"/>
+   <property name="RLEG_HIP_P.mode" value="Torque"/>
+   <property name="RLEG_HIP_P.NumOfAABB" value="1"/>
+   <property name="RLEG_HIP_Y.angle" value="0.0"/>
+   <property name="RLEG_HIP_Y.mode" value="Torque"/>
+   <property name="RLEG_HIP_Y.NumOfAABB" value="1"/>
+   <property name="RLEG_KNEE.angle" value="0.0"/>
+   <property name="RLEG_KNEE.mode" value="Torque"/>
+   <property name="RLEG_KNEE.NumOfAABB" value="1"/>
+   <property name="RLEG_ANKLE_P.angle" value="0.0"/>
+   <property name="RLEG_ANKLE_P.mode" value="Torque"/>
+   <property name="RLEG_ANKLE_P.NumOfAABB" value="1"/>
+   <property name="RLEG_ANKLE_R.angle" value="0.0"/>
+   <property name="RLEG_ANKLE_R.mode" value="Torque"/>
+   <property name="RLEG_ANKLE_R.NumOfAABB" value="1"/>
+   <property name="RARM_SHOULDER_P.angle" value="0.0"/>
+   <property name="RARM_SHOULDER_P.mode" value="Torque"/>
+   <property name="RARM_SHOULDER_P.NumOfAABB" value="1"/>
+   <property name="RARM_SHOULDER_R.angle" value="0.0"/>
+   <property name="RARM_SHOULDER_R.mode" value="Torque"/>
+   <property name="RARM_SHOULDER_R.NumOfAABB" value="1"/>
+   <property name="RARM_SHOULDER_Y.angle" value="0.0"/>
+   <property name="RARM_SHOULDER_Y.mode" value="Torque"/>
+   <property name="RARM_SHOULDER_Y.NumOfAABB" value="1"/>
+   <property name="RARM_ELBOW.angle" value="0.0"/>
+   <property name="RARM_ELBOW.mode" value="Torque"/>
+   <property name="RARM_ELBOW.NumOfAABB" value="1"/>
+   <property name="RARM_WRIST_Y.angle" value="0.0"/>
+   <property name="RARM_WRIST_Y.mode" value="Torque"/>
+   <property name="RARM_WRIST_Y.NumOfAABB" value="1"/>
+   <property name="RARM_WRIST_P.angle" value="0.0"/>
+   <property name="RARM_WRIST_P.mode" value="Torque"/>
+   <property name="RARM_WRIST_P.NumOfAABB" value="1"/>
+   <property name="RARM_WRIST_R.angle" value="0.0"/>
+   <property name="RARM_WRIST_R.mode" value="Torque"/>
+   <property name="RARM_WRIST_R.NumOfAABB" value="1"/>
+   <property name="LLEG_HIP_R.angle" value="0.0"/>
+   <property name="LLEG_HIP_R.mode" value="Torque"/>
+   <property name="LLEG_HIP_R.NumOfAABB" value="1"/>
+   <property name="LLEG_HIP_P.angle" value="0.0"/>
+   <property name="LLEG_HIP_P.mode" value="Torque"/>
+   <property name="LLEG_HIP_P.NumOfAABB" value="1"/>
+   <property name="LLEG_HIP_Y.angle" value="0.0"/>
+   <property name="LLEG_HIP_Y.mode" value="Torque"/>
+   <property name="LLEG_HIP_Y.NumOfAABB" value="1"/>
+   <property name="LLEG_KNEE.angle" value="0.0"/>
+   <property name="LLEG_KNEE.mode" value="Torque"/>
+   <property name="LLEG_KNEE.NumOfAABB" value="1"/>
+   <property name="LLEG_ANKLE_P.angle" value="0.0"/>
+   <property name="LLEG_ANKLE_P.mode" value="Torque"/>
+   <property name="LLEG_ANKLE_P.NumOfAABB" value="1"/>
+   <property name="LLEG_ANKLE_R.angle" value="0.0"/>
+   <property name="LLEG_ANKLE_R.mode" value="Torque"/>
+   <property name="LLEG_ANKLE_R.NumOfAABB" value="1"/>
+   <property name="LARM_SHOULDER_P.angle" value="0.0"/>
+   <property name="LARM_SHOULDER_P.mode" value="Torque"/>
+   <property name="LARM_SHOULDER_P.NumOfAABB" value="1"/>
+   <property name="LARM_SHOULDER_R.angle" value="0.0"/>
+   <property name="LARM_SHOULDER_R.mode" value="Torque"/>
+   <property name="LARM_SHOULDER_R.NumOfAABB" value="1"/>
+   <property name="LARM_SHOULDER_Y.angle" value="0.0"/>
+   <property name="LARM_SHOULDER_Y.mode" value="Torque"/>
+   <property name="LARM_SHOULDER_Y.NumOfAABB" value="1"/>
+   <property name="LARM_ELBOW.angle" value="0.0"/>
+   <property name="LARM_ELBOW.mode" value="Torque"/>
+   <property name="LARM_ELBOW.NumOfAABB" value="1"/>
+   <property name="LARM_WRIST_Y.angle" value="0.0"/>
+   <property name="LARM_WRIST_Y.mode" value="Torque"/>
+   <property name="LARM_WRIST_Y.NumOfAABB" value="1"/>
+   <property name="LARM_WRIST_P.angle" value="0.0"/>
+   <property name="LARM_WRIST_P.mode" value="Torque"/>
+   <property name="LARM_WRIST_P.NumOfAABB" value="1"/>
+   <property name="LARM_WRIST_R.angle" value="0.0"/>
+   <property name="LARM_WRIST_R.mode" value="Torque"/>
+   <property name="LARM_WRIST_R.NumOfAABB" value="1"/>
+   <property name="WAIST_P.angle" value="0.0"/>
+   <property name="WAIST_P.mode" value="Torque"/>
+   <property name="WAIST_P.NumOfAABB" value="1"/>
+   <property name="WAIST_R.angle" value="0.0"/>
+   <property name="WAIST_R.mode" value="Torque"/>
+   <property name="WAIST_R.NumOfAABB" value="1"/>
+   <property name="CHEST.angle" value="0.0"/>
+   <property name="CHEST.mode" value="Torque"/>
+   <property name="CHEST.NumOfAABB" value="1"/>
+  </item>
+  <view class="com.generalrobotix.ui.view.Grx3DView" name="3DView">
+   <property name="view.mode" value="Room"/>
+   <property name="showCoM" value="false"/>
+   <property name="showCoMonFloor" value="false"/>
+   <property name="showDistance" value="false"/>
+   <property name="showIntersection" value="false"/>
+   <property name="eyeHomePosition" value="-0.70711 -0 0.70711 2 0.70711 -0 0.70711 2 0 1 0 0.8 0 0 0 1 "/>
+   <property name="showCollision" value="true"/>
+   <property name="showActualState" value="true"/>
+   <property name="showScale" value="true"/>
+  </view>
+  <item class="com.generalrobotix.ui.item.GrxModelItem" name="longfloor" url="@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/longfloor.wrl">
+   <property name="rtcName" value="longfloor(Robot)0"/>
+   <property name="WAIST.NumOfAABB" value="1"/>
+   <property name="WAIST.translation" value="0  0  -0.1"/>
+   <property name="WAIST.rotation" value="1 0 0 0"/>
+  </item>
+  <item class="com.generalrobotix.ui.item.GrxModelItem" name="tiltplate" url="@CMAKE_INSTALL_PREFIX@/share/@PROJECT_NAME@/model/tiltplate.wrl">
+   <property name="rtcName" value="tiltplate(Robot)0"/>
+   <property name="WAIST.NumOfAABB" value="1"/>
+   <property name="WAIST.translation" value="0 0 0.5"/>
+   <property name="WAIST.rotation" value="1 0 0 0"/>
+   <property name="WAIST.angle" value="0" />
+   <property name="WAIST.mode" value="Torque"/>
+   <property name="controller" value="TiltPlateController"/>
+  </item>
+  <view class="com.generalrobotix.ui.view.Grx3DView" name="3DView">
+   <property name="view.mode" value="Room"/>
+   <property name="showCoM" value="false"/>
+   <property name="showCoMonFloor" value="false"/>
+   <property name="showDistance" value="false"/>
+   <property name="showIntersection" value="false"/>
+   <property name="eyeHomePosition" value="-0.70711 -0 0.70711 2 0.70711 -0 0.70711 2 0 1 0 0.8 0 0 0 1 "/>
+   <property name="showCollision" value="true"/>
+   <property name="showActualState" value="true"/>
+   <property name="showScale" value="true"/>
+  </view>
+  <item class="com.generalrobotix.ui.item.GrxCollisionPairItem" name="CP#longfloor_#sample1_bush_">
+   <property name="springConstant" value="0 0 0 0 0 0"/>
+   <property name="slidingFriction" value="0.5"/>
+   <property name="jointName2" value=""/>
+   <property name="jointName1" value=""/>
+   <property name="damperConstant" value="0 0 0 0 0 0"/>
+   <property name="objectName2" value="longfloor"/>
+   <property name="objectName1" value="sample1_bush"/>
+   <property name="springDamperModel" value="false"/>
+   <property name="staticFriction" value="0.5"/>
+  </item>
+ </mode>
+</grxui>

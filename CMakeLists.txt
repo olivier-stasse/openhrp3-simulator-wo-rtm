@@ -3,12 +3,15 @@ cmake_minimum_required(VERSION 2.6)
 include(cmake/base.cmake)
 include(cmake/boost.cmake)
 include(cmake/ros.cmake)
-include(cmake/pthread.cmake)
+#include(cmake/pthread.cmake)
 
 project(openhrp3_simulator_wo_rtm)
 
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
 
+#if (UNIX)
+#  search_for_pthread()
+#endif(UNIX)
 set(PROJECT_NAME openhrp3_simulator_wo_rtm)
 set(PROJECT_DESCRIPTION "OpenHRP simulator")
 set(PROJECT_URL "http://github.com/olivier-stasse/openhrp3-simulator-wo-rtm")
